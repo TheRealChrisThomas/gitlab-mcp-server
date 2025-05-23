@@ -24,6 +24,109 @@ gitlab-mcp-server
 - **Git History Preservation**: Operations maintain proper Git history without force pushing
 - **Batch Operations**: Support for both single-file and multi-file operations
 - **Project Workflow Management**: Label and milestone management for better project organization
+- **Repository Management**: Search, create, and fork GitLab projects
+- **File Operations**: Create, update, and retrieve file contents
+- **Branch Management**: Create branches and manage repository structure
+- **Issue Tracking**: Create and manage issues
+- **Merge Requests**: Create and manage merge requests
+- **Label Management**: Create, update, and delete project labels
+- **Project Milestones**: Create, update, and delete project-level milestones
+- **Group Milestones**: Create, update, and delete group-level milestones that span multiple projects
+
+## Group Milestones vs Project Milestones
+
+This server supports both **project milestones** and **group milestones**:
+
+### Project Milestones
+
+- Scoped to a single project
+- Use tools: `list_milestones`, `create_milestone`, `update_milestone`, `delete_milestone`
+- Example: Track features for `budgetocity-webapp` project
+
+### Group Milestones
+
+- Span multiple projects within a group
+- Use tools: `list_group_milestones`, `create_group_milestone`, `update_group_milestone`, `delete_group_milestone`
+- Support advanced filtering with `include_ancestors`, `include_descendants`
+- Example: Track a release across `budgetocity-webapp`, `budgetocity-api`, and `budgetocity-admin`
+
+## Group Milestone Examples
+
+### List Group Milestones
+
+```json
+{
+  "group_id": "budgetocity",
+  "state": "active",
+  "include_descendants": true
+}
+```
+
+### Create Group Milestone
+
+```json
+{
+  "group_id": "budgetocity",
+  "title": "Q1 2025 Release",
+  "description": "Major feature release including new budgeting tools and performance improvements",
+  "due_date": "2025-03-31",
+  "start_date": "2025-01-01"
+}
+```
+
+### Advanced Group Milestone Search
+
+```json
+{
+  "group_id": "budgetocity/core",
+  "search": "release",
+  "include_ancestors": true,
+  "updated_after": "2024-01-01T00:00:00Z"
+}
+```
+
+Based on the [GitLab Group Milestones API](https://docs.gitlab.com/api/group_milestones/), group milestones are ideal for coordinating releases and features across multiple projects in your organization.
+
+## Practical Workflow: Finding Groups and Creating Milestones
+
+Here's a typical workflow for working with group milestones:
+
+### 1. Search for Groups
+
+First, find the group you want to work with:
+
+```json
+{
+  "search": "budgetocity",
+  "owned": true
+}
+```
+
+### 2. List Existing Group Milestones
+
+Check what milestones already exist:
+
+```json
+{
+  "group_id": "budgetocity",
+  "state": "active"
+}
+```
+
+### 3. Create a Group Milestone
+
+Create a milestone that spans multiple projects:
+
+```json
+{
+  "group_id": "budgetocity",
+  "title": "Q1 2025 Release",
+  "description": "Cross-project release including webapp, API, and admin features",
+  "due_date": "2025-03-31"
+}
+```
+
+This workflow is especially useful for large organizations with multiple related projects under the same group.
 
 ## Tools
 
@@ -58,7 +161,18 @@ gitlab-mcp-server
      - `per_page` (optional number): Results per page (default 20)
    - Returns: Project search results
 
-4. `create_repository`
+4. `search_groups`
+
+   - Search for GitLab groups
+   - Inputs:
+     - `search` (string): Search query for groups
+     - `page` (optional number): Page number for pagination
+     - `per_page` (optional number): Results per page (default 20)
+     - `owned` (optional boolean): Limit by groups owned by the current user
+     - `min_access_level` (optional number): Minimum access level (10=Guest, 20=Reporter, 30=Developer, 40=Maintainer, 50=Owner)
+   - Returns: Group search results
+
+5. `create_repository`
 
    - Create a new GitLab project
    - Inputs:
@@ -68,7 +182,7 @@ gitlab-mcp-server
      - `initialize_with_readme` (optional boolean): Initialize with README
    - Returns: Created project details
 
-5. `get_file_contents`
+6. `get_file_contents`
 
    - Get contents of a file or directory
    - Inputs:
@@ -77,7 +191,7 @@ gitlab-mcp-server
      - `ref` (optional string): Branch/tag/commit to get contents from
    - Returns: File/directory contents
 
-6. `create_issue`
+7. `create_issue`
 
    - Create a new issue
    - Inputs:
@@ -89,7 +203,7 @@ gitlab-mcp-server
      - `milestone_id` (optional number): Milestone ID
    - Returns: Created issue details
 
-7. `create_merge_request`
+8. `create_merge_request`
 
    - Create a new merge request
    - Inputs:
@@ -102,7 +216,7 @@ gitlab-mcp-server
      - `allow_collaboration` (optional boolean): Allow commits from upstream members
    - Returns: Created merge request details
 
-8. `fork_repository`
+9. `fork_repository`
 
    - Fork a project
    - Inputs:
@@ -110,16 +224,16 @@ gitlab-mcp-server
      - `namespace` (optional string): Namespace to fork to
    - Returns: Forked project details
 
-9. `create_branch`
+10. `create_branch`
 
-   - Create a new branch
-   - Inputs:
-     - `project_id` (string): Project ID or URL-encoded path
-     - `branch` (string): Name for new branch
-     - `ref` (optional string): Source branch/commit for new branch
-   - Returns: Created branch reference
+- Create a new branch
+- Inputs:
+  - `project_id` (string): Project ID or URL-encoded path
+  - `branch` (string): Name for new branch
+  - `ref` (optional string): Source branch/commit for new branch
+- Returns: Created branch reference
 
-10. `list_labels`
+11. `list_labels`
 
 - List all labels in a project
 - Inputs:
@@ -128,7 +242,7 @@ gitlab-mcp-server
   - `per_page` (optional number): Results per page (default 20)
 - Returns: Array of label objects
 
-11. `create_label`
+12. `create_label`
 
 - Create a new label
 - Inputs:
@@ -139,7 +253,7 @@ gitlab-mcp-server
   - `priority` (optional number): Label priority
 - Returns: Created label details
 
-12. `update_label`
+13. `update_label`
 
 - Update an existing label
 - Inputs:
@@ -151,7 +265,7 @@ gitlab-mcp-server
   - `priority` (optional number): New label priority
 - Returns: Updated label details
 
-13. `delete_label`
+14. `delete_label`
 
 - Delete a label
 - Inputs:
@@ -159,7 +273,7 @@ gitlab-mcp-server
   - `name` (string): Label name to delete
 - Returns: Success confirmation
 
-14. `list_milestones`
+15. `list_milestones`
 
 - List all milestones in a project
 - Inputs:
@@ -169,7 +283,7 @@ gitlab-mcp-server
   - `per_page` (optional number): Results per page (default 20)
 - Returns: Array of milestone objects
 
-15. `create_milestone`
+16. `create_milestone`
 
 - Create a new milestone
 - Inputs:
@@ -180,7 +294,7 @@ gitlab-mcp-server
   - `start_date` (optional string): Start date (YYYY-MM-DD)
 - Returns: Created milestone details
 
-16. `update_milestone`
+17. `update_milestone`
 
 - Update an existing milestone
 - Inputs:
@@ -193,7 +307,7 @@ gitlab-mcp-server
   - `state_event` (optional string): 'close' or 'activate'
 - Returns: Updated milestone details
 
-17. `delete_milestone`
+18. `delete_milestone`
 
 - Delete a milestone
 - Inputs:

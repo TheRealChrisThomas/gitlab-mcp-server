@@ -15,6 +15,7 @@ import {
   GitLabContentSchema,
   GitLabCreateUpdateFileResponseSchema,
   GitLabSearchResponseSchema,
+  GitLabGroupSearchResponseSchema,
   GitLabTreeSchema,
   GitLabCommitSchema,
   CreateRepositoryOptionsSchema,
@@ -23,6 +24,7 @@ import {
   CreateBranchOptionsSchema,
   CreateOrUpdateFileSchema,
   SearchRepositoriesSchema,
+  SearchGroupsSchema,
   CreateRepositorySchema,
   GetFileContentsSchema,
   PushFilesSchema,
@@ -38,6 +40,10 @@ import {
   UpdateMilestoneSchema,
   DeleteMilestoneSchema,
   ListMilestonesSchema,
+  ListGroupMilestonesSchema,
+  CreateGroupMilestoneSchema,
+  UpdateGroupMilestoneSchema,
+  DeleteGroupMilestoneSchema,
   type GitLabFork,
   type GitLabReference,
   type GitLabRepository,
@@ -46,13 +52,17 @@ import {
   type GitLabContent,
   type GitLabCreateUpdateFileResponse,
   type GitLabSearchResponse,
+  type GitLabGroupSearchResponse,
   type GitLabTree,
   type GitLabCommit,
   type GitLabLabelResponse,
   type GitLabMilestoneResponse,
+  type GitLabGroupMilestoneResponse,
   type FileOperation,
   GitLabLabelSchema,
-  GitLabMilestoneSchema
+  GitLabMilestoneSchema,
+  GitLabGroupMilestoneSchema,
+  GitLabGroupSchema
 } from "./schemas.js";
 
 const server = new Server(
@@ -306,6 +316,43 @@ async function searchProjects(query: string, page: number = 1, perPage: number =
   });
 }
 
+async function searchGroups(
+  query: string,
+  page: number = 1,
+  perPage: number = 20,
+  owned?: boolean,
+  minAccessLevel?: number
+): Promise<GitLabGroupSearchResponse> {
+  const url = new URL(`${GITLAB_API_URL}/groups`);
+  url.searchParams.append("search", query);
+  url.searchParams.append("page", page.toString());
+  url.searchParams.append("per_page", perPage.toString());
+
+  if (owned !== undefined) {
+    url.searchParams.append("owned", owned.toString());
+  }
+
+  if (minAccessLevel !== undefined) {
+    url.searchParams.append("min_access_level", minAccessLevel.toString());
+  }
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      Authorization: `Bearer ${GITLAB_PERSONAL_ACCESS_TOKEN}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitLab API error: ${response.statusText}`);
+  }
+
+  const groups = await response.json();
+  return GitLabGroupSearchResponseSchema.parse({
+    count: parseInt(response.headers.get("X-Total") || "0"),
+    items: groups
+  });
+}
+
 async function createRepository(options: z.infer<typeof CreateRepositoryOptionsSchema>): Promise<GitLabRepository> {
   const response = await fetch(`${GITLAB_API_URL}/projects`, {
     method: "POST",
@@ -518,6 +565,115 @@ async function deleteMilestone(projectId: string, milestoneId: number): Promise<
   }
 }
 
+// Group milestone management functions
+async function listGroupMilestones(
+  groupId: string,
+  options: {
+    state?: "active" | "closed";
+    title?: string;
+    search?: string;
+    search_title?: string;
+    include_ancestors?: boolean;
+    include_descendants?: boolean;
+    updated_before?: string;
+    updated_after?: string;
+    containing_date?: string;
+    start_date?: string;
+    end_date?: string;
+    page?: number;
+    per_page?: number;
+  } = {}
+): Promise<GitLabGroupMilestoneResponse[]> {
+  const url = new URL(`${GITLAB_API_URL}/groups/${encodeURIComponent(groupId)}/milestones`);
+
+  // Add query parameters
+  Object.entries(options).forEach(([key, value]) => {
+    if (value !== undefined) {
+      url.searchParams.append(key, value.toString());
+    }
+  });
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      Authorization: `Bearer ${GITLAB_PERSONAL_ACCESS_TOKEN}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitLab API error: ${response.statusText}`);
+  }
+
+  return z.array(GitLabGroupMilestoneSchema).parse(await response.json());
+}
+
+async function createGroupMilestone(
+  groupId: string,
+  title: string,
+  description?: string,
+  dueDate?: string,
+  startDate?: string
+): Promise<GitLabGroupMilestoneResponse> {
+  const response = await fetch(`${GITLAB_API_URL}/groups/${encodeURIComponent(groupId)}/milestones`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${GITLAB_PERSONAL_ACCESS_TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      title,
+      description,
+      due_date: dueDate,
+      start_date: startDate
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitLab API error: ${response.statusText}`);
+  }
+
+  return GitLabGroupMilestoneSchema.parse(await response.json());
+}
+
+async function updateGroupMilestone(
+  groupId: string,
+  milestoneId: number,
+  options: {
+    title?: string;
+    description?: string;
+    due_date?: string;
+    start_date?: string;
+    state_event?: "close" | "activate";
+  }
+): Promise<GitLabGroupMilestoneResponse> {
+  const response = await fetch(`${GITLAB_API_URL}/groups/${encodeURIComponent(groupId)}/milestones/${milestoneId}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${GITLAB_PERSONAL_ACCESS_TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(options)
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitLab API error: ${response.statusText}`);
+  }
+
+  return GitLabGroupMilestoneSchema.parse(await response.json());
+}
+
+async function deleteGroupMilestone(groupId: string, milestoneId: number): Promise<void> {
+  const response = await fetch(`${GITLAB_API_URL}/groups/${encodeURIComponent(groupId)}/milestones/${milestoneId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${GITLAB_PERSONAL_ACCESS_TOKEN}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitLab API error: ${response.statusText}`);
+  }
+}
+
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
@@ -530,6 +686,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         name: "search_repositories",
         description: "Search for GitLab projects",
         inputSchema: zodToJsonSchema(SearchRepositoriesSchema)
+      },
+      {
+        name: "search_groups",
+        description: "Search for GitLab groups",
+        inputSchema: zodToJsonSchema(SearchGroupsSchema)
       },
       {
         name: "create_repository",
@@ -607,6 +768,27 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         name: "delete_milestone",
         description: "Delete a milestone from a GitLab project",
         inputSchema: zodToJsonSchema(DeleteMilestoneSchema)
+      },
+      // New tools for group milestones
+      {
+        name: "list_group_milestones",
+        description: "List all milestones in a GitLab group",
+        inputSchema: zodToJsonSchema(ListGroupMilestonesSchema)
+      },
+      {
+        name: "create_group_milestone",
+        description: "Create a new milestone in a GitLab group",
+        inputSchema: zodToJsonSchema(CreateGroupMilestoneSchema)
+      },
+      {
+        name: "update_group_milestone",
+        description: "Update an existing milestone in a GitLab group",
+        inputSchema: zodToJsonSchema(UpdateGroupMilestoneSchema)
+      },
+      {
+        name: "delete_group_milestone",
+        description: "Delete a milestone from a GitLab group",
+        inputSchema: zodToJsonSchema(DeleteGroupMilestoneSchema)
       }
     ]
   };
@@ -643,6 +825,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case "search_repositories": {
         const args = SearchRepositoriesSchema.parse(request.params.arguments);
         const results = await searchProjects(args.search, args.page, args.per_page);
+        return { content: [{ type: "text", text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case "search_groups": {
+        const args = SearchGroupsSchema.parse(request.params.arguments);
+        const results = await searchGroups(args.search, args.page, args.per_page, args.owned, args.min_access_level);
         return { content: [{ type: "text", text: JSON.stringify(results, null, 2) }] };
       }
 
@@ -745,6 +933,33 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case "delete_milestone": {
         const args = DeleteMilestoneSchema.parse(request.params.arguments);
         await deleteMilestone(args.project_id, args.milestone_id);
+        return { content: [{ type: "text", text: JSON.stringify({ success: true }, null, 2) }] };
+      }
+
+      // Group milestone tools
+      case "list_group_milestones": {
+        const args = ListGroupMilestonesSchema.parse(request.params.arguments);
+        const { group_id, ...options } = args;
+        const milestones = await listGroupMilestones(group_id, options);
+        return { content: [{ type: "text", text: JSON.stringify(milestones, null, 2) }] };
+      }
+
+      case "create_group_milestone": {
+        const args = CreateGroupMilestoneSchema.parse(request.params.arguments);
+        const milestone = await createGroupMilestone(args.group_id, args.title, args.description, args.due_date, args.start_date);
+        return { content: [{ type: "text", text: JSON.stringify(milestone, null, 2) }] };
+      }
+
+      case "update_group_milestone": {
+        const args = UpdateGroupMilestoneSchema.parse(request.params.arguments);
+        const { group_id, milestone_id, ...options } = args;
+        const milestone = await updateGroupMilestone(group_id, milestone_id, options);
+        return { content: [{ type: "text", text: JSON.stringify(milestone, null, 2) }] };
+      }
+
+      case "delete_group_milestone": {
+        const args = DeleteGroupMilestoneSchema.parse(request.params.arguments);
+        await deleteGroupMilestone(args.group_id, args.milestone_id);
         return { content: [{ type: "text", text: JSON.stringify({ success: true }, null, 2) }] };
       }
 

@@ -144,6 +144,26 @@ export const GitLabSearchResponseSchema = z.object({
   items: z.array(GitLabRepositorySchema)
 });
 
+// Group related schemas
+export const GitLabGroupSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  path: z.string(),
+  description: z.string().nullable(),
+  visibility: z.string(),
+  full_name: z.string(),
+  full_path: z.string(),
+  web_url: z.string(),
+  avatar_url: z.string().nullable(),
+  created_at: z.string(),
+  parent_id: z.number().nullable()
+});
+
+export const GitLabGroupSearchResponseSchema = z.object({
+  count: z.number(),
+  items: z.array(GitLabGroupSchema)
+});
+
 // Fork related schemas
 export const GitLabForkParentSchema = z.object({
   name: z.string(),
@@ -187,6 +207,22 @@ export const GitLabMilestoneSchema = z.object({
   id: z.number(),
   iid: z.number(),
   project_id: z.number(),
+  title: z.string(),
+  description: z.string().nullable(),
+  state: z.string(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  due_date: z.string().nullable(),
+  start_date: z.string().nullable(),
+  web_url: z.string(),
+  expired: z.boolean().optional()
+});
+
+// Group milestone schema (similar to project milestone but with group_id)
+export const GitLabGroupMilestoneSchema = z.object({
+  id: z.number(),
+  iid: z.number(),
+  group_id: z.number(), // Changed from project_id to group_id
   title: z.string(),
   description: z.string().nullable(),
   state: z.string(),
@@ -260,6 +296,17 @@ export const SearchRepositoriesSchema = z.object({
   search: z.string().describe("Search query"), // Changed from query to match GitLab API
   page: z.number().optional().describe("Page number for pagination (default: 1)"),
   per_page: z.number().optional().describe("Number of results per page (default: 20)")
+});
+
+export const SearchGroupsSchema = z.object({
+  search: z.string().describe("Search query for groups"),
+  page: z.number().optional().describe("Page number for pagination (default: 1)"),
+  per_page: z.number().optional().describe("Number of results per page (default: 20)"),
+  owned: z.boolean().optional().describe("Limit by groups owned by the current user"),
+  min_access_level: z
+    .number()
+    .optional()
+    .describe("Limit by minimum access level (10=Guest, 20=Reporter, 30=Developer, 40=Maintainer, 50=Owner)")
 });
 
 export const CreateRepositorySchema = z.object({
@@ -373,6 +420,47 @@ export const ListMilestonesSchema = z.object({
   per_page: z.number().optional()
 });
 
+// Group milestone management schemas
+export const ListGroupMilestonesSchema = z.object({
+  group_id: z.string().describe("Group ID or URL-encoded path"),
+  state: z.enum(["active", "closed"]).optional().describe("Return only active or closed milestones"),
+  title: z.string().optional().describe("Return only milestones with the given title (case-sensitive)"),
+  search: z.string().optional().describe("Return only milestones with title or description matching the string"),
+  search_title: z.string().optional().describe("Return only milestones with title matching the string"),
+  include_ancestors: z.boolean().optional().describe("Include milestones for all parent groups"),
+  include_descendants: z.boolean().optional().describe("Include milestones for group and its descendants"),
+  updated_before: z.string().optional().describe("Return only milestones updated before the given datetime (ISO 8601)"),
+  updated_after: z.string().optional().describe("Return only milestones updated after the given datetime (ISO 8601)"),
+  containing_date: z.string().optional().describe("Return only milestones containing the given date"),
+  start_date: z.string().optional().describe("Return only milestones where due_date >= start_date"),
+  end_date: z.string().optional().describe("Return only milestones where start_date <= end_date"),
+  page: z.number().optional().describe("Page number for pagination (default: 1)"),
+  per_page: z.number().optional().describe("Number of results per page (default: 20)")
+});
+
+export const CreateGroupMilestoneSchema = z.object({
+  group_id: z.string().describe("Group ID or URL-encoded path"),
+  title: z.string().describe("The title of the milestone"),
+  description: z.string().optional().describe("The description of the milestone"),
+  due_date: z.string().optional().describe("The due date of the milestone (YYYY-MM-DD)"),
+  start_date: z.string().optional().describe("The start date of the milestone (YYYY-MM-DD)")
+});
+
+export const UpdateGroupMilestoneSchema = z.object({
+  group_id: z.string().describe("Group ID or URL-encoded path"),
+  milestone_id: z.number().describe("The ID of the group milestone"),
+  title: z.string().optional().describe("The title of the milestone"),
+  description: z.string().optional().describe("The description of the milestone"),
+  due_date: z.string().optional().describe("The due date of the milestone (YYYY-MM-DD)"),
+  start_date: z.string().optional().describe("The start date of the milestone (YYYY-MM-DD)"),
+  state_event: z.enum(["close", "activate"]).optional().describe("The state event of the milestone")
+});
+
+export const DeleteGroupMilestoneSchema = z.object({
+  group_id: z.string().describe("Group ID or URL-encoded path"),
+  milestone_id: z.number().describe("The ID of the group milestone")
+});
+
 // Export types
 export type GitLabAuthor = z.infer<typeof GitLabAuthorSchema>;
 export type GitLabFork = z.infer<typeof GitLabForkSchema>;
@@ -394,3 +482,6 @@ export type GitLabCreateUpdateFileResponse = z.infer<typeof GitLabCreateUpdateFi
 export type GitLabSearchResponse = z.infer<typeof GitLabSearchResponseSchema>;
 export type GitLabLabelResponse = z.infer<typeof GitLabLabelSchema>;
 export type GitLabMilestoneResponse = z.infer<typeof GitLabMilestoneSchema>;
+export type GitLabGroupMilestoneResponse = z.infer<typeof GitLabGroupMilestoneSchema>;
+export type GitLabGroup = z.infer<typeof GitLabGroupSchema>;
+export type GitLabGroupSearchResponse = z.infer<typeof GitLabGroupSearchResponseSchema>;
