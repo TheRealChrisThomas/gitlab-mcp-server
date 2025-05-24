@@ -44,6 +44,14 @@ import {
   CreateGroupMilestoneSchema,
   UpdateGroupMilestoneSchema,
   DeleteGroupMilestoneSchema,
+  ListIssuesSchema,
+  UpdateIssueSchema,
+  SearchIssuesSchema,
+  AddIssueCommentSchema,
+  ListMergeRequestsSchema,
+  UpdateMergeRequestSchema,
+  MergeMergeRequestSchema,
+  AddMergeRequestCommentSchema,
   type GitLabFork,
   type GitLabReference,
   type GitLabRepository,
@@ -58,11 +66,13 @@ import {
   type GitLabLabelResponse,
   type GitLabMilestoneResponse,
   type GitLabGroupMilestoneResponse,
+  type GitLabComment,
   type FileOperation,
   GitLabLabelSchema,
   GitLabMilestoneSchema,
   GitLabGroupMilestoneSchema,
-  GitLabGroupSchema
+  GitLabGroupSchema,
+  GitLabCommentSchema
 } from "./schemas.js";
 
 const server = new Server(
@@ -674,6 +684,238 @@ async function deleteGroupMilestone(groupId: string, milestoneId: number): Promi
   }
 }
 
+// Issue management functions
+async function listIssues(
+  projectId: string,
+  options: {
+    state?: "opened" | "closed" | "all";
+    labels?: string;
+    milestone?: string;
+    assignee_id?: number;
+    author_id?: number;
+    search?: string;
+    created_after?: string;
+    created_before?: string;
+    updated_after?: string;
+    updated_before?: string;
+    sort?: string;
+    order_by?: "asc" | "desc";
+    page?: number;
+    per_page?: number;
+  } = {}
+): Promise<GitLabIssue[]> {
+  const url = new URL(`${GITLAB_API_URL}/projects/${encodeURIComponent(projectId)}/issues`);
+
+  // Add query parameters
+  Object.entries(options).forEach(([key, value]) => {
+    if (value !== undefined) {
+      url.searchParams.append(key, value.toString());
+    }
+  });
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      Authorization: `Bearer ${GITLAB_PERSONAL_ACCESS_TOKEN}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitLab API error: ${response.statusText}`);
+  }
+
+  return z.array(GitLabIssueSchema).parse(await response.json());
+}
+
+async function updateIssue(
+  projectId: string,
+  issueIid: number,
+  options: {
+    title?: string;
+    description?: string;
+    state_event?: "close" | "reopen";
+    labels?: string[];
+    assignee_ids?: number[];
+    milestone_id?: number;
+  }
+): Promise<GitLabIssue> {
+  const response = await fetch(`${GITLAB_API_URL}/projects/${encodeURIComponent(projectId)}/issues/${issueIid}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${GITLAB_PERSONAL_ACCESS_TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      ...options,
+      labels: options.labels?.join(",")
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitLab API error: ${response.statusText}`);
+  }
+
+  return GitLabIssueSchema.parse(await response.json());
+}
+
+async function searchIssues(
+  projectId: string,
+  searchTerm: string,
+  options: {
+    state?: "opened" | "closed" | "all";
+    labels?: string;
+    page?: number;
+    per_page?: number;
+  } = {}
+): Promise<GitLabIssue[]> {
+  return listIssues(projectId, {
+    search: searchTerm,
+    ...options
+  });
+}
+
+async function addIssueComment(projectId: string, issueIid: number, body: string): Promise<GitLabComment> {
+  const response = await fetch(`${GITLAB_API_URL}/projects/${encodeURIComponent(projectId)}/issues/${issueIid}/notes`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${GITLAB_PERSONAL_ACCESS_TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ body })
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitLab API error: ${response.statusText}`);
+  }
+
+  return GitLabCommentSchema.parse(await response.json());
+}
+
+// Merge request management functions
+async function listMergeRequests(
+  projectId: string,
+  options: {
+    state?: "opened" | "closed" | "locked" | "merged" | "all";
+    target_branch?: string;
+    source_branch?: string;
+    labels?: string;
+    milestone?: string;
+    assignee_id?: number;
+    author_id?: number;
+    search?: string;
+    created_after?: string;
+    created_before?: string;
+    updated_after?: string;
+    updated_before?: string;
+    sort?: "created_at" | "updated_at" | "title";
+    order_by?: "asc" | "desc";
+    page?: number;
+    per_page?: number;
+  } = {}
+): Promise<GitLabMergeRequest[]> {
+  const url = new URL(`${GITLAB_API_URL}/projects/${encodeURIComponent(projectId)}/merge_requests`);
+
+  // Add query parameters
+  Object.entries(options).forEach(([key, value]) => {
+    if (value !== undefined) {
+      url.searchParams.append(key, value.toString());
+    }
+  });
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      Authorization: `Bearer ${GITLAB_PERSONAL_ACCESS_TOKEN}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitLab API error: ${response.statusText}`);
+  }
+
+  return z.array(GitLabMergeRequestSchema).parse(await response.json());
+}
+
+async function updateMergeRequest(
+  projectId: string,
+  mergeRequestIid: number,
+  options: {
+    title?: string;
+    description?: string;
+    state_event?: "close" | "reopen";
+    target_branch?: string;
+    labels?: string[];
+    assignee_ids?: number[];
+    milestone_id?: number;
+    remove_source_branch?: boolean;
+  }
+): Promise<GitLabMergeRequest> {
+  const response = await fetch(`${GITLAB_API_URL}/projects/${encodeURIComponent(projectId)}/merge_requests/${mergeRequestIid}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${GITLAB_PERSONAL_ACCESS_TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      ...options,
+      labels: options.labels?.join(",")
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitLab API error: ${response.statusText}`);
+  }
+
+  return GitLabMergeRequestSchema.parse(await response.json());
+}
+
+async function mergeMergeRequest(
+  projectId: string,
+  mergeRequestIid: number,
+  options: {
+    merge_commit_message?: string;
+    should_remove_source_branch?: boolean;
+    merge_when_pipeline_succeeds?: boolean;
+    sha?: string;
+  } = {}
+): Promise<GitLabMergeRequest> {
+  const response = await fetch(
+    `${GITLAB_API_URL}/projects/${encodeURIComponent(projectId)}/merge_requests/${mergeRequestIid}/merge`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${GITLAB_PERSONAL_ACCESS_TOKEN}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(options)
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`GitLab API error: ${response.statusText}`);
+  }
+
+  return GitLabMergeRequestSchema.parse(await response.json());
+}
+
+async function addMergeRequestComment(projectId: string, mergeRequestIid: number, body: string): Promise<GitLabComment> {
+  const response = await fetch(
+    `${GITLAB_API_URL}/projects/${encodeURIComponent(projectId)}/merge_requests/${mergeRequestIid}/notes`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${GITLAB_PERSONAL_ACCESS_TOKEN}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ body })
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`GitLab API error: ${response.statusText}`);
+  }
+
+  return GitLabCommentSchema.parse(await response.json());
+}
+
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
@@ -789,6 +1031,47 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         name: "delete_group_milestone",
         description: "Delete a milestone from a GitLab group",
         inputSchema: zodToJsonSchema(DeleteGroupMilestoneSchema)
+      },
+      // New tools for issues
+      {
+        name: "list_issues",
+        description: "List all issues in a GitLab project",
+        inputSchema: zodToJsonSchema(ListIssuesSchema)
+      },
+      {
+        name: "update_issue",
+        description: "Update an existing issue in a GitLab project",
+        inputSchema: zodToJsonSchema(UpdateIssueSchema)
+      },
+      {
+        name: "search_issues",
+        description: "Search for issues in a GitLab project",
+        inputSchema: zodToJsonSchema(SearchIssuesSchema)
+      },
+      {
+        name: "add_issue_comment",
+        description: "Add a comment to an issue in a GitLab project",
+        inputSchema: zodToJsonSchema(AddIssueCommentSchema)
+      },
+      {
+        name: "list_merge_requests",
+        description: "List all merge requests in a GitLab project",
+        inputSchema: zodToJsonSchema(ListMergeRequestsSchema)
+      },
+      {
+        name: "update_merge_request",
+        description: "Update an existing merge request in a GitLab project",
+        inputSchema: zodToJsonSchema(UpdateMergeRequestSchema)
+      },
+      {
+        name: "merge_merge_request",
+        description: "Merge a merge request in a GitLab project",
+        inputSchema: zodToJsonSchema(MergeMergeRequestSchema)
+      },
+      {
+        name: "add_merge_request_comment",
+        description: "Add a comment to a merge request in a GitLab project",
+        inputSchema: zodToJsonSchema(AddMergeRequestCommentSchema)
       }
     ]
   };
@@ -961,6 +1244,61 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const args = DeleteGroupMilestoneSchema.parse(request.params.arguments);
         await deleteGroupMilestone(args.group_id, args.milestone_id);
         return { content: [{ type: "text", text: JSON.stringify({ success: true }, null, 2) }] };
+      }
+
+      // Issue tools
+      case "list_issues": {
+        const args = ListIssuesSchema.parse(request.params.arguments);
+        const { project_id, ...options } = args;
+        const issues = await listIssues(project_id, options);
+        return { content: [{ type: "text", text: JSON.stringify(issues, null, 2) }] };
+      }
+
+      case "update_issue": {
+        const args = UpdateIssueSchema.parse(request.params.arguments);
+        const { project_id, issue_iid, ...options } = args;
+        const issue = await updateIssue(project_id, issue_iid, options);
+        return { content: [{ type: "text", text: JSON.stringify(issue, null, 2) }] };
+      }
+
+      case "search_issues": {
+        const args = SearchIssuesSchema.parse(request.params.arguments);
+        const { project_id, search, ...options } = args;
+        const issues = await searchIssues(project_id, search, options);
+        return { content: [{ type: "text", text: JSON.stringify(issues, null, 2) }] };
+      }
+
+      case "add_issue_comment": {
+        const args = AddIssueCommentSchema.parse(request.params.arguments);
+        const comment = await addIssueComment(args.project_id, args.issue_iid, args.body);
+        return { content: [{ type: "text", text: JSON.stringify(comment, null, 2) }] };
+      }
+
+      case "list_merge_requests": {
+        const args = ListMergeRequestsSchema.parse(request.params.arguments);
+        const { project_id, ...options } = args;
+        const mergeRequests = await listMergeRequests(project_id, options);
+        return { content: [{ type: "text", text: JSON.stringify(mergeRequests, null, 2) }] };
+      }
+
+      case "update_merge_request": {
+        const args = UpdateMergeRequestSchema.parse(request.params.arguments);
+        const { project_id, merge_request_iid, ...options } = args;
+        const mergeRequest = await updateMergeRequest(project_id, merge_request_iid, options);
+        return { content: [{ type: "text", text: JSON.stringify(mergeRequest, null, 2) }] };
+      }
+
+      case "merge_merge_request": {
+        const args = MergeMergeRequestSchema.parse(request.params.arguments);
+        const { project_id, merge_request_iid, ...options } = args;
+        const mergeRequest = await mergeMergeRequest(project_id, merge_request_iid, options);
+        return { content: [{ type: "text", text: JSON.stringify(mergeRequest, null, 2) }] };
+      }
+
+      case "add_merge_request_comment": {
+        const args = AddMergeRequestCommentSchema.parse(request.params.arguments);
+        const comment = await addMergeRequestComment(args.project_id, args.merge_request_iid, args.body);
+        return { content: [{ type: "text", text: JSON.stringify(comment, null, 2) }] };
       }
 
       default:

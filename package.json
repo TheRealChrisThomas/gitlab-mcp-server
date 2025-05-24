@@ -1,57 +1,59 @@
 {
   "name": "@therealchristhomas/gitlab-mcp-server",
-  "version": "1.1.0",
-  "description": "MCP server for using the GitLab API",
-  "license": "MIT",
-  "author": "Chris Thomas",
-  "homepage": "https://github.com/therealchristhomas/gitlab-mcp-server",
-  "bugs": "https://github.com/therealchristhomas/gitlab-mcp-server/issues",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/therealchristhomas/gitlab-mcp-server.git"
+  "version": "1.2.0",
+  "description": "MCP Server for GitLab API operations",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "gitlab-mcp": "./dist/index.js"
   },
+  "scripts": {
+    "build": "tsc && shx chmod +x dist/*.js",
+    "prepare": "npm run build",
+    "dev": "node --loader ts-node/esm src/index.ts",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.2",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.23.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.1",
+    "shx": "^0.3.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "package.json"
+  ],
   "keywords": [
     "mcp",
     "model-context-protocol",
     "gitlab",
     "api",
+    "git",
+    "repository",
     "project-management",
-    "labels",
     "milestones",
     "group-milestones",
     "groups",
-    "search"
+    "search",
+    "issues",
+    "merge-requests",
+    "comments",
+    "labels"
   ],
-  "type": "module",
-  "main": "dist/index.js",
-  "bin": {
-    "gitlab-mcp": "dist/index.js"
+  "author": "Chris Thomas",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/therealchristhomas/gitlab-mcp.git"
   },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "build": "tsc && shx chmod +x dist/*.js",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm run build",
-    "watch": "tsc --watch",
-    "start": "node dist/index.js",
-    "dev": "tsc && node dist/index.js"
+  "bugs": {
+    "url": "https://github.com/therealchristhomas/gitlab-mcp/issues"
   },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "1.0.1",
-    "@types/node-fetch": "^2.6.12",
-    "node-fetch": "^3.3.2",
-    "zod": "^3.22.4",
-    "zod-to-json-schema": "^3.23.5"
-  },
-  "devDependencies": {
-    "shx": "^0.3.4",
-    "typescript": "^5.6.2"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+  "homepage": "https://github.com/therealchristhomas/gitlab-mcp#readme"
 }

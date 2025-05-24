@@ -461,6 +461,126 @@ export const DeleteGroupMilestoneSchema = z.object({
   milestone_id: z.number().describe("The ID of the group milestone")
 });
 
+// Issue management schemas
+export const ListIssuesSchema = z.object({
+  project_id: z.string().describe("Project ID or URL-encoded path"),
+  state: z.enum(["opened", "closed", "all"]).optional().describe("Filter issues by state"),
+  labels: z.string().optional().describe("Comma-separated list of label names"),
+  milestone: z.string().optional().describe("Milestone title"),
+  assignee_id: z.number().optional().describe("User ID of assignee"),
+  author_id: z.number().optional().describe("User ID of author"),
+  search: z.string().optional().describe("Search against title and description"),
+  created_after: z.string().optional().describe("Return issues created after date (ISO 8601)"),
+  created_before: z.string().optional().describe("Return issues created before date (ISO 8601)"),
+  updated_after: z.string().optional().describe("Return issues updated after date (ISO 8601)"),
+  updated_before: z.string().optional().describe("Return issues updated before date (ISO 8601)"),
+  sort: z
+    .enum([
+      "created_at",
+      "updated_at",
+      "priority",
+      "due_date",
+      "relative_position",
+      "label_priority",
+      "milestone_due",
+      "popularity",
+      "weight"
+    ])
+    .optional()
+    .describe("Sort issues"),
+  order_by: z.enum(["asc", "desc"]).optional().describe("Sort order"),
+  page: z.number().optional().describe("Page number for pagination (default: 1)"),
+  per_page: z.number().optional().describe("Number of results per page (default: 20)")
+});
+
+export const UpdateIssueSchema = z.object({
+  project_id: z.string().describe("Project ID or URL-encoded path"),
+  issue_iid: z.number().describe("Issue internal ID"),
+  title: z.string().optional().describe("New issue title"),
+  description: z.string().optional().describe("New issue description"),
+  state_event: z.enum(["close", "reopen"]).optional().describe("Change issue state"),
+  labels: z.array(z.string()).optional().describe("Array of label names"),
+  assignee_ids: z.array(z.number()).optional().describe("Array of user IDs to assign"),
+  milestone_id: z.number().optional().describe("Milestone ID to assign")
+});
+
+export const SearchIssuesSchema = z.object({
+  project_id: z.string().describe("Project ID or URL-encoded path"),
+  search: z.string().describe("Search term for title and description"),
+  state: z.enum(["opened", "closed", "all"]).optional().describe("Filter issues by state"),
+  labels: z.string().optional().describe("Comma-separated list of label names"),
+  page: z.number().optional().describe("Page number for pagination (default: 1)"),
+  per_page: z.number().optional().describe("Number of results per page (default: 20)")
+});
+
+export const AddIssueCommentSchema = z.object({
+  project_id: z.string().describe("Project ID or URL-encoded path"),
+  issue_iid: z.number().describe("Issue internal ID"),
+  body: z.string().describe("Content of the comment")
+});
+
+// Merge request management schemas
+export const ListMergeRequestsSchema = z.object({
+  project_id: z.string().describe("Project ID or URL-encoded path"),
+  state: z.enum(["opened", "closed", "locked", "merged", "all"]).optional().describe("Filter merge requests by state"),
+  target_branch: z.string().optional().describe("Filter by target branch"),
+  source_branch: z.string().optional().describe("Filter by source branch"),
+  labels: z.string().optional().describe("Comma-separated list of label names"),
+  milestone: z.string().optional().describe("Milestone title"),
+  assignee_id: z.number().optional().describe("User ID of assignee"),
+  author_id: z.number().optional().describe("User ID of author"),
+  search: z.string().optional().describe("Search against title and description"),
+  created_after: z.string().optional().describe("Return MRs created after date (ISO 8601)"),
+  created_before: z.string().optional().describe("Return MRs created before date (ISO 8601)"),
+  updated_after: z.string().optional().describe("Return MRs updated after date (ISO 8601)"),
+  updated_before: z.string().optional().describe("Return MRs updated before date (ISO 8601)"),
+  sort: z.enum(["created_at", "updated_at", "title"]).optional().describe("Sort merge requests"),
+  order_by: z.enum(["asc", "desc"]).optional().describe("Sort order"),
+  page: z.number().optional().describe("Page number for pagination (default: 1)"),
+  per_page: z.number().optional().describe("Number of results per page (default: 20)")
+});
+
+export const UpdateMergeRequestSchema = z.object({
+  project_id: z.string().describe("Project ID or URL-encoded path"),
+  merge_request_iid: z.number().describe("Merge request internal ID"),
+  title: z.string().optional().describe("New merge request title"),
+  description: z.string().optional().describe("New merge request description"),
+  state_event: z.enum(["close", "reopen"]).optional().describe("Change merge request state"),
+  target_branch: z.string().optional().describe("New target branch"),
+  labels: z.array(z.string()).optional().describe("Array of label names"),
+  assignee_ids: z.array(z.number()).optional().describe("Array of user IDs to assign"),
+  milestone_id: z.number().optional().describe("Milestone ID to assign"),
+  remove_source_branch: z.boolean().optional().describe("Remove source branch when merged")
+});
+
+export const MergeMergeRequestSchema = z.object({
+  project_id: z.string().describe("Project ID or URL-encoded path"),
+  merge_request_iid: z.number().describe("Merge request internal ID"),
+  merge_commit_message: z.string().optional().describe("Custom merge commit message"),
+  should_remove_source_branch: z.boolean().optional().describe("Remove source branch after merge"),
+  merge_when_pipeline_succeeds: z.boolean().optional().describe("Merge when pipeline succeeds"),
+  sha: z.string().optional().describe("SHA that must match the source branch HEAD")
+});
+
+export const AddMergeRequestCommentSchema = z.object({
+  project_id: z.string().describe("Project ID or URL-encoded path"),
+  merge_request_iid: z.number().describe("Merge request internal ID"),
+  body: z.string().describe("Content of the comment")
+});
+
+// Comment response schema
+export const GitLabCommentSchema = z.object({
+  id: z.number(),
+  body: z.string(),
+  author: GitLabUserSchema,
+  created_at: z.string(),
+  updated_at: z.string(),
+  system: z.boolean(),
+  noteable_id: z.number(),
+  noteable_type: z.string(),
+  web_url: z.string()
+});
+
 // Export types
 export type GitLabAuthor = z.infer<typeof GitLabAuthorSchema>;
 export type GitLabFork = z.infer<typeof GitLabForkSchema>;
@@ -485,3 +605,4 @@ export type GitLabMilestoneResponse = z.infer<typeof GitLabMilestoneSchema>;
 export type GitLabGroupMilestoneResponse = z.infer<typeof GitLabGroupMilestoneSchema>;
 export type GitLabGroup = z.infer<typeof GitLabGroupSchema>;
 export type GitLabGroupSearchResponse = z.infer<typeof GitLabGroupSearchResponseSchema>;
+export type GitLabComment = z.infer<typeof GitLabCommentSchema>;

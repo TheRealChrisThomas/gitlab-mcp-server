@@ -7,17 +7,17 @@ MCP Server for the GitLab API, enabling project management, file operations, and
 ### NPX (Recommended)
 
 ```bash
-npx gitlab-mcp-server
+npx @therealchristhomas/gitlab-mcp-server
 ```
 
 ### Global Installation
 
 ```bash
-npm install -g gitlab-mcp-server
-gitlab-mcp-server
+npm install -g @therealchristhomas/gitlab-mcp-server
+gitlab-mcp
 ```
 
-### Features
+## Features
 
 - **Automatic Branch Creation**: When creating/updating files or pushing changes, branches are automatically created if they don't exist
 - **Comprehensive Error Handling**: Clear error messages for common issues
@@ -27,8 +27,8 @@ gitlab-mcp-server
 - **Repository Management**: Search, create, and fork GitLab projects
 - **File Operations**: Create, update, and retrieve file contents
 - **Branch Management**: Create branches and manage repository structure
-- **Issue Tracking**: Create and manage issues
-- **Merge Requests**: Create and manage merge requests
+- **Issue Management**: Create, list, update, search, and comment on issues
+- **Merge Request Management**: List, update, merge, and comment on merge requests
 - **Label Management**: Create, update, and delete project labels
 - **Project Milestones**: Create, update, and delete project-level milestones
 - **Group Milestones**: Create, update, and delete group-level milestones that span multiple projects
@@ -41,14 +41,14 @@ This server supports both **project milestones** and **group milestones**:
 
 - Scoped to a single project
 - Use tools: `list_milestones`, `create_milestone`, `update_milestone`, `delete_milestone`
-- Example: Track features for `budgetocity-webapp` project
+- Example: Track features for `my-webapp` project
 
 ### Group Milestones
 
 - Span multiple projects within a group
 - Use tools: `list_group_milestones`, `create_group_milestone`, `update_group_milestone`, `delete_group_milestone`
 - Support advanced filtering with `include_ancestors`, `include_descendants`
-- Example: Track a release across `budgetocity-webapp`, `budgetocity-api`, and `budgetocity-admin`
+- Example: Track a release across `my-webapp`, `my-api`, and `my-admin`
 
 ## Group Milestone Examples
 
@@ -56,7 +56,7 @@ This server supports both **project milestones** and **group milestones**:
 
 ```json
 {
-  "group_id": "budgetocity",
+  "group_id": "my-organization",
   "state": "active",
   "include_descendants": true
 }
@@ -66,9 +66,9 @@ This server supports both **project milestones** and **group milestones**:
 
 ```json
 {
-  "group_id": "budgetocity",
+  "group_id": "my-organization",
   "title": "Q1 2025 Release",
-  "description": "Major feature release including new budgeting tools and performance improvements",
+  "description": "Major feature release including new tools and performance improvements",
   "due_date": "2025-03-31",
   "start_date": "2025-01-01"
 }
@@ -78,7 +78,7 @@ This server supports both **project milestones** and **group milestones**:
 
 ```json
 {
-  "group_id": "budgetocity/core",
+  "group_id": "my-organization/core",
   "search": "release",
   "include_ancestors": true,
   "updated_after": "2024-01-01T00:00:00Z"
@@ -97,7 +97,7 @@ First, find the group you want to work with:
 
 ```json
 {
-  "search": "budgetocity",
+  "search": "my-organization",
   "owned": true
 }
 ```
@@ -108,7 +108,7 @@ Check what milestones already exist:
 
 ```json
 {
-  "group_id": "budgetocity",
+  "group_id": "my-organization",
   "state": "active"
 }
 ```
@@ -119,7 +119,7 @@ Create a milestone that spans multiple projects:
 
 ```json
 {
-  "group_id": "budgetocity",
+  "group_id": "my-organization",
   "title": "Q1 2025 Release",
   "description": "Cross-project release including webapp, API, and admin features",
   "due_date": "2025-03-31"
@@ -226,94 +226,262 @@ This workflow is especially useful for large organizations with multiple related
 
 10. `create_branch`
 
-- Create a new branch
-- Inputs:
-  - `project_id` (string): Project ID or URL-encoded path
-  - `branch` (string): Name for new branch
-  - `ref` (optional string): Source branch/commit for new branch
-- Returns: Created branch reference
+    - Create a new branch
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `branch` (string): Name for new branch
+      - `ref` (optional string): Source branch/commit for new branch
+    - Returns: Created branch reference
 
 11. `list_labels`
 
-- List all labels in a project
-- Inputs:
-  - `project_id` (string): Project ID or URL-encoded path
-  - `page` (optional number): Page number for pagination
-  - `per_page` (optional number): Results per page (default 20)
-- Returns: Array of label objects
+    - List all labels in a project
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `page` (optional number): Page number for pagination
+      - `per_page` (optional number): Results per page (default 20)
+    - Returns: Array of label objects
 
 12. `create_label`
 
-- Create a new label
-- Inputs:
-  - `project_id` (string): Project ID or URL-encoded path
-  - `name` (string): Label name
-  - `color` (string): Label color (hex code)
-  - `description` (optional string): Label description
-  - `priority` (optional number): Label priority
-- Returns: Created label details
+    - Create a new label
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `name` (string): Label name
+      - `color` (string): Label color (hex code)
+      - `description` (optional string): Label description
+      - `priority` (optional number): Label priority
+    - Returns: Created label details
 
 13. `update_label`
 
-- Update an existing label
-- Inputs:
-  - `project_id` (string): Project ID or URL-encoded path
-  - `name` (string): Current label name
-  - `new_name` (optional string): New label name
-  - `color` (optional string): New label color
-  - `description` (optional string): New label description
-  - `priority` (optional number): New label priority
-- Returns: Updated label details
+    - Update an existing label
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `name` (string): Current label name
+      - `new_name` (optional string): New label name
+      - `color` (optional string): New label color
+      - `description` (optional string): New label description
+      - `priority` (optional number): New label priority
+    - Returns: Updated label details
 
 14. `delete_label`
 
-- Delete a label
-- Inputs:
-  - `project_id` (string): Project ID or URL-encoded path
-  - `name` (string): Label name to delete
-- Returns: Success confirmation
+    - Delete a label
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `name` (string): Label name to delete
+    - Returns: Success confirmation
 
 15. `list_milestones`
 
-- List all milestones in a project
-- Inputs:
-  - `project_id` (string): Project ID or URL-encoded path
-  - `state` (optional string): 'active' or 'closed'
-  - `page` (optional number): Page number for pagination
-  - `per_page` (optional number): Results per page (default 20)
-- Returns: Array of milestone objects
+    - List all milestones in a project
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `state` (optional string): 'active' or 'closed'
+      - `page` (optional number): Page number for pagination
+      - `per_page` (optional number): Results per page (default 20)
+    - Returns: Array of milestone objects
 
 16. `create_milestone`
 
-- Create a new milestone
-- Inputs:
-  - `project_id` (string): Project ID or URL-encoded path
-  - `title` (string): Milestone title
-  - `description` (optional string): Milestone description
-  - `due_date` (optional string): Due date (YYYY-MM-DD)
-  - `start_date` (optional string): Start date (YYYY-MM-DD)
-- Returns: Created milestone details
+    - Create a new milestone
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `title` (string): Milestone title
+      - `description` (optional string): Milestone description
+      - `due_date` (optional string): Due date (YYYY-MM-DD)
+      - `start_date` (optional string): Start date (YYYY-MM-DD)
+    - Returns: Created milestone details
 
 17. `update_milestone`
 
-- Update an existing milestone
-- Inputs:
-  - `project_id` (string): Project ID or URL-encoded path
-  - `milestone_id` (number): Milestone ID
-  - `title` (optional string): New title
-  - `description` (optional string): New description
-  - `due_date` (optional string): New due date
-  - `start_date` (optional string): New start date
-  - `state_event` (optional string): 'close' or 'activate'
-- Returns: Updated milestone details
+    - Update an existing milestone
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `milestone_id` (number): Milestone ID
+      - `title` (optional string): New title
+      - `description` (optional string): New description
+      - `due_date` (optional string): New due date
+      - `start_date` (optional string): New start date
+      - `state_event` (optional string): 'close' or 'activate'
+    - Returns: Updated milestone details
 
 18. `delete_milestone`
 
-- Delete a milestone
-- Inputs:
-  - `project_id` (string): Project ID or URL-encoded path
-  - `milestone_id` (number): Milestone ID to delete
-- Returns: Success confirmation
+    - Delete a milestone
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `milestone_id` (number): Milestone ID to delete
+    - Returns: Success confirmation
+
+19. `list_group_milestones`
+
+    - List all milestones in a GitLab group
+    - Inputs:
+      - `group_id` (string): Group ID or URL-encoded path
+      - `state` (optional string): 'active' or 'closed'
+      - `title` (optional string): Filter by milestone title (case-sensitive)
+      - `search` (optional string): Search in title or description
+      - `search_title` (optional string): Search in title only
+      - `include_ancestors` (optional boolean): Include parent group milestones
+      - `include_descendants` (optional boolean): Include subgroup milestones
+      - `updated_before` (optional string): Filter by update date (ISO 8601)
+      - `updated_after` (optional string): Filter by update date (ISO 8601)
+      - `containing_date` (optional string): Milestones containing given date
+      - `start_date` (optional string): Filter where due_date >= start_date
+      - `end_date` (optional string): Filter where start_date <= end_date
+      - `page` (optional number): Page number for pagination
+      - `per_page` (optional number): Results per page (default 20)
+    - Returns: Array of group milestone objects
+
+20. `create_group_milestone`
+
+    - Create a new milestone in a GitLab group
+    - Inputs:
+      - `group_id` (string): Group ID or URL-encoded path
+      - `title` (string): Milestone title
+      - `description` (optional string): Milestone description
+      - `due_date` (optional string): Due date (YYYY-MM-DD)
+      - `start_date` (optional string): Start date (YYYY-MM-DD)
+    - Returns: Created group milestone details
+
+21. `update_group_milestone`
+
+    - Update an existing milestone in a GitLab group
+    - Inputs:
+      - `group_id` (string): Group ID or URL-encoded path
+      - `milestone_id` (number): Milestone ID
+      - `title` (optional string): New title
+      - `description` (optional string): New description
+      - `due_date` (optional string): New due date
+      - `start_date` (optional string): New start date
+      - `state_event` (optional string): 'close' or 'activate'
+    - Returns: Updated group milestone details
+
+22. `delete_group_milestone`
+
+    - Delete a milestone from a GitLab group
+    - Inputs:
+      - `group_id` (string): Group ID or URL-encoded path
+      - `milestone_id` (number): Milestone ID to delete
+    - Returns: Success confirmation
+
+23. `list_issues`
+
+    - List all issues in a GitLab project
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `state` (optional string): 'opened', 'closed', or 'all'
+      - `labels` (optional string): Comma-separated list of label names
+      - `milestone` (optional string): Milestone title
+      - `assignee_id` (optional number): User ID of assignee
+      - `author_id` (optional number): User ID of author
+      - `search` (optional string): Search against title and description
+      - `created_after` (optional string): Return issues created after date (ISO 8601)
+      - `created_before` (optional string): Return issues created before date (ISO 8601)
+      - `updated_after` (optional string): Return issues updated after date (ISO 8601)
+      - `updated_before` (optional string): Return issues updated before date (ISO 8601)
+      - `sort` (optional string): Sort issues by various criteria
+      - `order_by` (optional string): 'asc' or 'desc'
+      - `page` (optional number): Page number for pagination
+      - `per_page` (optional number): Results per page (default 20)
+    - Returns: Array of issue objects
+
+24. `update_issue`
+
+    - Update an existing issue in a GitLab project
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `issue_iid` (number): Issue internal ID
+      - `title` (optional string): New issue title
+      - `description` (optional string): New issue description
+      - `state_event` (optional string): 'close' or 'reopen'
+      - `labels` (optional string[]): Array of label names
+      - `assignee_ids` (optional number[]): Array of user IDs to assign
+      - `milestone_id` (optional number): Milestone ID to assign
+    - Returns: Updated issue details
+
+25. `search_issues`
+
+    - Search for issues in a GitLab project
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `search` (string): Search term for title and description
+      - `state` (optional string): 'opened', 'closed', or 'all'
+      - `labels` (optional string): Comma-separated list of label names
+      - `page` (optional number): Page number for pagination
+      - `per_page` (optional number): Results per page (default 20)
+    - Returns: Array of matching issue objects
+
+26. `add_issue_comment`
+
+    - Add a comment to an issue in a GitLab project
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `issue_iid` (number): Issue internal ID
+      - `body` (string): Content of the comment
+    - Returns: Created comment details
+
+27. `list_merge_requests`
+
+    - List all merge requests in a GitLab project
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `state` (optional string): 'opened', 'closed', 'locked', 'merged', or 'all'
+      - `target_branch` (optional string): Filter by target branch
+      - `source_branch` (optional string): Filter by source branch
+      - `labels` (optional string): Comma-separated list of label names
+      - `milestone` (optional string): Milestone title
+      - `assignee_id` (optional number): User ID of assignee
+      - `author_id` (optional number): User ID of author
+      - `search` (optional string): Search against title and description
+      - `created_after` (optional string): Return MRs created after date (ISO 8601)
+      - `created_before` (optional string): Return MRs created before date (ISO 8601)
+      - `updated_after` (optional string): Return MRs updated after date (ISO 8601)
+      - `updated_before` (optional string): Return MRs updated before date (ISO 8601)
+      - `sort` (optional string): Sort merge requests
+      - `order_by` (optional string): 'asc' or 'desc'
+      - `page` (optional number): Page number for pagination
+      - `per_page` (optional number): Results per page (default 20)
+    - Returns: Array of merge request objects
+
+28. `update_merge_request`
+
+    - Update an existing merge request in a GitLab project
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `merge_request_iid` (number): Merge request internal ID
+      - `title` (optional string): New merge request title
+      - `description` (optional string): New merge request description
+      - `state_event` (optional string): 'close' or 'reopen'
+      - `target_branch` (optional string): New target branch
+      - `labels` (optional string[]): Array of label names
+      - `assignee_ids` (optional number[]): Array of user IDs to assign
+      - `milestone_id` (optional number): Milestone ID to assign
+      - `remove_source_branch` (optional boolean): Remove source branch when merged
+    - Returns: Updated merge request details
+
+29. `merge_merge_request`
+
+    - Merge a merge request in a GitLab project
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `merge_request_iid` (number): Merge request internal ID
+      - `merge_commit_message` (optional string): Custom merge commit message
+      - `should_remove_source_branch` (optional boolean): Remove source branch after merge
+      - `merge_when_pipeline_succeeds` (optional boolean): Merge when pipeline succeeds
+      - `sha` (optional string): SHA that must match the source branch HEAD
+    - Returns: Merged merge request details
+
+30. `add_merge_request_comment`
+
+    - Add a comment to a merge request in a GitLab project
+    - Inputs:
+      - `project_id` (string): Project ID or URL-encoded path
+      - `merge_request_iid` (number): Merge request internal ID
+      - `body` (string): Content of the comment
+    - Returns: Created comment details
 
 ## Setup
 
@@ -332,132 +500,72 @@ This workflow is especially useful for large organizations with multiple related
 
 Add the following to your `claude_desktop_config.json`:
 
-#### Docker
-
 ```json
 {
   "mcpServers": {
     "gitlab": {
-      "command": "docker",
-      "args": ["run", "--rm", "-i", "-e", "GITLAB_PERSONAL_ACCESS_TOKEN", "-e", "GITLAB_API_URL", "mcp/gitlab"],
+      "command": "npx",
+      "args": ["-y", "@therealchristhomas/gitlab-mcp-server"],
       "env": {
         "GITLAB_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>",
-        "GITLAB_API_URL": "https://gitlab.com/api/v4" // Optional, for self-hosted instances
+        "GITLAB_API_URL": "https://gitlab.com/api/v4"
       }
     }
   }
 }
 ```
 
-#### NPX
+### Usage with Cursor
+
+Add the following to your Cursor MCP configuration:
 
 ```json
 {
   "mcpServers": {
     "gitlab": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-gitlab"],
+      "args": ["-y", "@therealchristhomas/gitlab-mcp-server"],
       "env": {
         "GITLAB_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>",
-        "GITLAB_API_URL": "https://gitlab.com/api/v4" // Optional, for self-hosted instances
+        "GITLAB_API_URL": "https://gitlab.com/api/v4"
       }
     }
   }
 }
 ```
 
-### Usage with VS Code
-
-For quick installation, use one of the one-click installation buttons below...
-
-[![Install with NPX in VS Code](https://img.shields.io/badge/VS_Code-NPM-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](<https://insiders.vscode.dev/redirect/mcp/install?name=gitlab&inputs=%5B%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22gitlab_token%22%2C%22description%22%3A%22GitLab%20Personal%20Access%20Token%22%2C%22password%22%3Atrue%7D%2C%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22gitlab_url%22%2C%22description%22%3A%22GitLab%20API%20URL%20(optional%2C%20default%3A%20https%3A%2F%2Fgitlab.com%2Fapi%2Fv4)%22%2C%22default%22%3A%22https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%22%7D%5D&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40modelcontextprotocol%2Fserver-gitlab%22%5D%2C%22env%22%3A%7B%22GITLAB_PERSONAL_ACCESS_TOKEN%22%3A%22%24%7Binput%3Agitlab_token%7D%22%2C%22GITLAB_API_URL%22%3A%22%24%7Binput%3Agitlab_url%7D%22%7D%7D>) [![Install with NPX in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-NPM-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](<https://insiders.vscode.dev/redirect/mcp/install?name=gitlab&inputs=%5B%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22gitlab_token%22%2C%22description%22%3A%22GitLab%20Personal%20Access%20Token%22%2C%22password%22%3Atrue%7D%2C%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22gitlab_url%22%2C%22description%22%3A%22GitLab%20API%20URL%20(optional%2C%20default%3A%20https%3A%2F%2Fgitlab.com%2Fapi%2Fv4)%22%2C%22default%22%3A%22https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%22%7D%5D&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40modelcontextprotocol%2Fserver-gitlab%22%5D%2C%22env%22%3A%7B%22GITLAB_PERSONAL_ACCESS_TOKEN%22%3A%22%24%7Binput%3Agitlab_token%7D%22%2C%22GITLAB_API_URL%22%3A%22%24%7Binput%3Agitlab_url%7D%22%7D%7D&quality=insiders>)
-
-[![Install with Docker in VS Code](https://img.shields.io/badge/VS_Code-Docker-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](<https://insiders.vscode.dev/redirect/mcp/install?name=gitlab&inputs=%5B%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22gitlab_token%22%2C%22description%22%3A%22GitLab%20Personal%20Access%20Token%22%2C%22password%22%3Atrue%7D%2C%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22gitlab_url%22%2C%22description%22%3A%22GitLab%20API%20URL%20(optional%2C%20default%3A%20https%3A%2F%2Fgitlab.com%2Fapi%2Fv4)%22%2C%22default%22%3A%22https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%22%7D%5D&config=%7B%22command%22%3A%22docker%22%2C%22args%22%3A%5B%22run%22%2C%22--rm%22%2C%22-i%22%2C%22mcp%2Fgitlab%22%5D%2C%22env%22%3A%7B%22GITLAB_PERSONAL_ACCESS_TOKEN%22%3A%22%24%7Binput%3Agitlab_token%7D%22%2C%22GITLAB_API_URL%22%3A%22%24%7Binput%3Agitlab_url%7D%22%7D%7D>) [![Install with Docker in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Docker-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](<https://insiders.vscode.dev/redirect/mcp/install?name=gitlab&inputs=%5B%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22gitlab_token%22%2C%22description%22%3A%22GitLab%20Personal%20Access%20Token%22%2C%22password%22%3Atrue%7D%2C%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22gitlab_url%22%2C%22description%22%3A%22GitLab%20API%20URL%20(optional%2C%20default%3A%20https%3A%2F%2Fgitlab.com%2Fapi%2Fv4)%22%2C%22default%22%3A%22https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%22%7D%5D&config=%7B%22command%22%3A%22docker%22%2C%22args%22%3A%5B%22run%22%2C%22--rm%22%2C%22-i%22%2C%22mcp%2Fgitlab%22%5D%2C%22env%22%3A%7B%22GITLAB_PERSONAL_ACCESS_TOKEN%22%3A%22%24%7Binput%3Agitlab_token%7D%22%2C%22GITLAB_API_URL%22%3A%22%24%7Binput%3Agitlab_url%7D%22%7D%7D&quality=insiders>)
-
-For manual installation, add the following JSON block to your User Settings (JSON) file in VS Code. You can do this by pressing `Ctrl + Shift + P` and typing `Preferences: Open User Settings (JSON)`.
-
-Optionally, you can add it to a file called `.vscode/mcp.json` in your workspace. This will allow you to share the configuration with others.
-
-> Note that the `mcp` key is not needed in the `.vscode/mcp.json` file.
-
-#### Docker
-
-```json
-{
-  "mcp": {
-    "inputs": [
-      {
-        "type": "promptString",
-        "id": "gitlab_token",
-        "description": "GitLab Personal Access Token",
-        "password": true
-      },
-      {
-        "type": "promptString",
-        "id": "gitlab_url",
-        "description": "GitLab API URL (optional)",
-        "default": "https://gitlab.com/api/v4"
-      }
-    ],
-    "servers": {
-      "gitlab": {
-        "command": "docker",
-        "args": ["run", "--rm", "-i", "mcp/gitlab"],
-        "env": {
-          "GITLAB_PERSONAL_ACCESS_TOKEN": "${input:gitlab_token}",
-          "GITLAB_API_URL": "${input:gitlab_url}"
-        }
-      }
-    }
-  }
-}
-```
-
-#### NPX
-
-```json
-{
-  "mcp": {
-    "inputs": [
-      {
-        "type": "promptString",
-        "id": "gitlab_token",
-        "description": "GitLab Personal Access Token",
-        "password": true
-      },
-      {
-        "type": "promptString",
-        "id": "gitlab_url",
-        "description": "GitLab API URL (optional)",
-        "default": "https://gitlab.com/api/v4"
-      }
-    ],
-    "servers": {
-      "gitlab": {
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-gitlab"],
-        "env": {
-          "GITLAB_PERSONAL_ACCESS_TOKEN": "${input:gitlab_token}",
-          "GITLAB_API_URL": "${input:gitlab_url}"
-        }
-      }
-    }
-  }
-}
-```
-
-## Build
-
-Docker build:
-
-```bash
-docker build -t vonwig/gitlab:mcp -f src/gitlab/Dockerfile .
-```
+**Note**: Replace `<YOUR_TOKEN>` with your actual GitLab Personal Access Token.
 
 ## Environment Variables
 
 - `GITLAB_PERSONAL_ACCESS_TOKEN`: Your GitLab personal access token (required)
 - `GITLAB_API_URL`: Base URL for GitLab API (optional, defaults to `https://gitlab.com/api/v4`)
+
+For self-hosted GitLab instances, update the `GITLAB_API_URL` to point to your instance:
+
+```
+"GITLAB_API_URL": "https://your-gitlab-instance.com/api/v4"
+```
+
+## Development
+
+### Build
+
+```bash
+npm run build
+```
+
+### Development Mode
+
+```bash
+npm run dev
+```
+
+### Watch Mode
+
+```bash
+npm run watch
+```
 
 ## License
 
