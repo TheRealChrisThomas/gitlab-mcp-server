@@ -1,6 +1,6 @@
 # GitLab MCP Server
 
-MCP Server for the GitLab API, enabling project management, file operations, and more.
+MCP Server for the GitLab API, enabling project management, file operations, and more. Forked from https://github.com/modelcontextprotocol
 
 ## Installation
 
