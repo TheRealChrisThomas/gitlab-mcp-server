@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="./mcp-logo.png" width="200" alt="MCP Logo">
+</div>
+
 # GitLab MCP Server
 
 MCP Server for the GitLab API, enabling project management, file operations, and more. Forked from https://github.com/modelcontextprotocol

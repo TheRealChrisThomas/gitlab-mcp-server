@@ -243,7 +243,7 @@ export const GitLabIssueSchema = z.object({
   state: z.string(),
   author: GitLabUserSchema,
   assignees: z.array(GitLabUserSchema),
-  labels: z.array(GitLabLabelSchema),
+  labels: z.array(z.string()),
   milestone: GitLabMilestoneSchema.nullable(),
   created_at: z.string(),
   updated_at: z.string(),
