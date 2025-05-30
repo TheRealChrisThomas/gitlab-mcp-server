@@ -1,0 +1,41 @@
+[
+  {
+    "id": 1001,
+    "name": "bug",
+    "color": "#d73a4a",
+    "description": "Something isn't working",
+    "text_color": "#ffffff",
+    "priority": 1,
+    "is_project_label": true,
+    "open_issues_count": 5,
+    "closed_issues_count": 12,
+    "open_merge_requests_count": 2,
+    "subscribed": false
+  },
+  {
+    "id": 1002,
+    "name": "enhancement",
+    "color": "#a2eeef",
+    "description": "New feature or request",
+    "text_color": "#000000",
+    "priority": null,
+    "is_project_label": true,
+    "open_issues_count": 8,
+    "closed_issues_count": 25,
+    "open_merge_requests_count": 4,
+    "subscribed": true
+  },
+  {
+    "id": 1003,
+    "name": "documentation",
+    "color": "#0075ca",
+    "description": "Improvements or additions to documentation",
+    "text_color": "#ffffff",
+    "priority": 3,
+    "is_project_label": true,
+    "open_issues_count": 2,
+    "closed_issues_count": 7,
+    "open_merge_requests_count": 1,
+    "subscribed": false
+  }
+]

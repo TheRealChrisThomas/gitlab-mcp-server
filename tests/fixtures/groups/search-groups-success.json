@@ -1,0 +1,128 @@
+[
+  {
+    "id": 123456,
+    "name": "Frontend Team",
+    "path": "frontend-team",
+    "description": "Frontend development team group",
+    "visibility": "private",
+    "share_with_group_lock": false,
+    "require_two_factor_authentication": false,
+    "two_factor_grace_period": 48,
+    "project_creation_level": "developer",
+    "auto_devops_enabled": null,
+    "subgroup_creation_level": "owner",
+    "emails_disabled": null,
+    "emails_enabled": null,
+    "mentions_disabled": null,
+    "lfs_enabled": true,
+    "default_branch": null,
+    "default_branch_protection": 2,
+    "default_branch_protection_defaults": {
+      "allowed_to_push": [
+        {
+          "access_level": 40
+        }
+      ],
+      "allow_force_push": false,
+      "allowed_to_merge": [
+        {
+          "access_level": 40
+        }
+      ]
+    },
+    "avatar_url": "https://gitlab.example.com/uploads/-/system/group/avatar/123456/avatar.png",
+    "web_url": "https://gitlab.example.com/groups/company/frontend-team",
+    "request_access_enabled": false,
+    "repository_storage": "default",
+    "full_name": "Company / Frontend Team",
+    "full_path": "company/frontend-team",
+    "file_template_project_id": 1,
+    "parent_id": 789,
+    "created_at": "2023-01-15T10:30:00.000Z",
+    "ip_restriction_ranges": null
+  },
+  {
+    "id": 234567,
+    "name": "Backend Team",
+    "path": "backend-team",
+    "description": "Backend development team group",
+    "visibility": "internal",
+    "share_with_group_lock": false,
+    "require_two_factor_authentication": false,
+    "two_factor_grace_period": 48,
+    "project_creation_level": "developer",
+    "auto_devops_enabled": null,
+    "subgroup_creation_level": "owner",
+    "emails_disabled": null,
+    "emails_enabled": null,
+    "mentions_disabled": null,
+    "lfs_enabled": true,
+    "default_branch": null,
+    "default_branch_protection": 2,
+    "default_branch_protection_defaults": {
+      "allowed_to_push": [
+        {
+          "access_level": 40
+        }
+      ],
+      "allow_force_push": false,
+      "allowed_to_merge": [
+        {
+          "access_level": 40
+        }
+      ]
+    },
+    "avatar_url": null,
+    "web_url": "https://gitlab.example.com/groups/company/backend-team",
+    "request_access_enabled": false,
+    "repository_storage": "default",
+    "full_name": "Company / Backend Team",
+    "full_path": "company/backend-team",
+    "file_template_project_id": 1,
+    "parent_id": 789,
+    "created_at": "2023-02-20T14:45:00.000Z",
+    "ip_restriction_ranges": null
+  },
+  {
+    "id": 345678,
+    "name": "DevOps",
+    "path": "devops",
+    "description": null,
+    "visibility": "public",
+    "share_with_group_lock": false,
+    "require_two_factor_authentication": false,
+    "two_factor_grace_period": 48,
+    "project_creation_level": "developer",
+    "auto_devops_enabled": null,
+    "subgroup_creation_level": "owner",
+    "emails_disabled": null,
+    "emails_enabled": null,
+    "mentions_disabled": null,
+    "lfs_enabled": true,
+    "default_branch": null,
+    "default_branch_protection": 2,
+    "default_branch_protection_defaults": {
+      "allowed_to_push": [
+        {
+          "access_level": 40
+        }
+      ],
+      "allow_force_push": false,
+      "allowed_to_merge": [
+        {
+          "access_level": 40
+        }
+      ]
+    },
+    "avatar_url": "https://gitlab.example.com/uploads/-/system/group/avatar/345678/devops.png",
+    "web_url": "https://gitlab.example.com/groups/devops",
+    "request_access_enabled": false,
+    "repository_storage": "default",
+    "full_name": "DevOps",
+    "full_path": "devops",
+    "file_template_project_id": 1,
+    "parent_id": null,
+    "created_at": "2022-12-01T09:15:00.000Z",
+    "ip_restriction_ranges": null
+  }
+]

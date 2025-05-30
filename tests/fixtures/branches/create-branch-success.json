@@ -1,0 +1,7 @@
+{
+  "name": "feature/new-feature",
+  "commit": {
+    "id": "abc123def456789",
+    "web_url": "http://example.com/group/project/-/commit/abc123def456789"
+  }
+}

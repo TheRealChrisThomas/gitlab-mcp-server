@@ -1,0 +1,26 @@
+{
+  "id": 987655,
+  "type": "DiscussionNote",
+  "body": "This merge request looks good to me. LGTM!",
+  "attachment": null,
+  "author": {
+    "id": 789,
+    "name": "John Doe",
+    "username": "johndoe",
+    "state": "active",
+    "avatar_url": "https://gitlab.example.com/uploads/user/avatar/789/avatar.png",
+    "web_url": "https://gitlab.example.com/johndoe"
+  },
+  "created_at": "2023-05-16T15:30:00.000Z",
+  "updated_at": "2023-05-16T15:30:00.000Z",
+  "system": false,
+  "noteable_id": 2001,
+  "noteable_type": "MergeRequest",
+  "project_id": 39430079,
+  "resolvable": false,
+  "confidential": false,
+  "internal": false,
+  "noteable_iid": 1,
+  "commands_changes": {},
+  "web_url": "https://gitlab.example.com/your-group/your-project/-/merge_requests/1#note_987655"
+}

@@ -22,6 +22,10 @@ export async function listIssues(
     per_page?: number;
   } = {}
 ): Promise<GitLabIssue[]> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/issues`;
   const params = buildSearchParams(options);
 
@@ -30,6 +34,13 @@ export async function listIssues(
 }
 
 export async function createIssue(projectId: string, options: CreateIssueOptions): Promise<GitLabIssue> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!options?.title?.trim()) {
+    throw new Error("Issue title is required");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/issues`;
 
   const issue = await gitlabPost<GitLabIssue>(endpoint, {
@@ -55,6 +66,13 @@ export async function updateIssue(
     milestone_id?: number;
   }
 ): Promise<GitLabIssue> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!issueIid || issueIid < 1) {
+    throw new Error("Valid issue IID is required");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/issues/${issueIid}`;
 
   const issue = await gitlabPut<GitLabIssue>(endpoint, {
@@ -75,6 +93,10 @@ export async function searchIssues(
     per_page?: number;
   } = {}
 ): Promise<GitLabIssue[]> {
+  if (!searchTerm?.trim()) {
+    throw new Error("Search term is required");
+  }
+
   return listIssues(projectId, {
     search: searchTerm,
     ...options
@@ -82,6 +104,16 @@ export async function searchIssues(
 }
 
 export async function addIssueComment(projectId: string, issueIid: number, body: string): Promise<GitLabComment> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!issueIid || issueIid < 1) {
+    throw new Error("Valid issue IID is required");
+  }
+  if (!body?.trim()) {
+    throw new Error("Comment body is required");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/issues/${issueIid}/notes`;
 
   const comment = await gitlabPost<GitLabComment>(endpoint, { body });

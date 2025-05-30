@@ -5,6 +5,16 @@ import { GitLabRepositorySchema, GitLabSearchResponseSchema, GitLabForkSchema } 
 import type { CreateRepositoryOptionsSchema } from "../schemas.js";
 
 export async function searchProjects(query: string, page: number = 1, perPage: number = 20): Promise<GitLabSearchResponse> {
+  if (!query?.trim()) {
+    throw new Error("Search query is required");
+  }
+  if (page < 1) {
+    throw new Error("Page number must be 1 or greater");
+  }
+  if (perPage < 1 || perPage > 100) {
+    throw new Error("Per page must be between 1 and 100");
+  }
+
   const params = buildSearchParams({
     search: query,
     page: page.toString(),
@@ -20,6 +30,10 @@ export async function searchProjects(query: string, page: number = 1, perPage: n
 }
 
 export async function createRepository(options: CreateRepositoryOptions): Promise<GitLabRepository> {
+  if (!options?.name?.trim()) {
+    throw new Error("Repository name is required");
+  }
+
   const repository = await gitlabPost<GitLabRepository>("/projects", {
     name: options.name,
     description: options.description,
@@ -31,6 +45,10 @@ export async function createRepository(options: CreateRepositoryOptions): Promis
 }
 
 export async function forkProject(projectId: string, namespace?: string): Promise<GitLabFork> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/fork`;
   const body = namespace ? { namespace } : undefined;
 

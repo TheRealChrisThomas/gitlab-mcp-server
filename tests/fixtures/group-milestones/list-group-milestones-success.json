@@ -1,0 +1,44 @@
+[
+  {
+    "id": 3001,
+    "iid": 1,
+    "group_id": 12345,
+    "title": "Q1 2024 Goals",
+    "description": "First quarter objectives and key results",
+    "state": "active",
+    "created_at": "2024-01-01T00:00:00.000Z",
+    "updated_at": "2024-01-15T10:30:00.000Z",
+    "due_date": "2024-03-31",
+    "start_date": "2024-01-01",
+    "web_url": "http://example.com/groups/mygroup/-/milestones/1",
+    "expired": false
+  },
+  {
+    "id": 3002,
+    "iid": 2,
+    "group_id": 12345,
+    "title": "Security Audit",
+    "description": null,
+    "state": "closed",
+    "created_at": "2024-01-15T08:00:00.000Z",
+    "updated_at": "2024-02-15T17:45:00.000Z",
+    "due_date": "2024-02-15",
+    "start_date": "2024-01-15",
+    "web_url": "http://example.com/groups/mygroup/-/milestones/2",
+    "expired": false
+  },
+  {
+    "id": 3003,
+    "iid": 3,
+    "group_id": 12345,
+    "title": "Long-term Strategy",
+    "description": "Strategic planning for the next 2 years",
+    "state": "active",
+    "created_at": "2024-02-01T12:00:00.000Z",
+    "updated_at": "2024-02-01T12:00:00.000Z",
+    "due_date": null,
+    "start_date": null,
+    "web_url": "http://example.com/groups/mygroup/-/milestones/3",
+    "expired": false
+  }
+]
