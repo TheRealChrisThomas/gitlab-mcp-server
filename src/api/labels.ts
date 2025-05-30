@@ -4,6 +4,16 @@ import type { GitLabLabelResponse } from "../types/index.js";
 import { GitLabLabelSchema } from "../types/index.js";
 
 export async function listLabels(projectId: string, page: number = 1, perPage: number = 20): Promise<GitLabLabelResponse[]> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (page < 1) {
+    throw new Error("Page number must be 1 or greater");
+  }
+  if (perPage < 1 || perPage > 100) {
+    throw new Error("Per page must be between 1 and 100");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/labels`;
   const params = buildSearchParams({
     page: page.toString(),
@@ -21,6 +31,19 @@ export async function createLabel(
   description?: string,
   priority?: number
 ): Promise<GitLabLabelResponse> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!name?.trim()) {
+    throw new Error("Label name is required");
+  }
+  if (!color?.trim()) {
+    throw new Error("Label color is required");
+  }
+  if (!color.match(/^#[0-9a-fA-F]{6}$/)) {
+    throw new Error("Label color must be a valid hex color (e.g., #ff0000)");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/labels`;
 
   const label = await gitlabPost<GitLabLabelResponse>(endpoint, {
@@ -43,6 +66,16 @@ export async function updateLabel(
     priority?: number;
   }
 ): Promise<GitLabLabelResponse> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!name?.trim()) {
+    throw new Error("Label name is required");
+  }
+  if (options.color && !options.color.match(/^#[0-9a-fA-F]{6}$/)) {
+    throw new Error("Label color must be a valid hex color (e.g., #ff0000)");
+  }
+
   const encodedName = encodeURIComponent(name);
   const endpoint = `/projects/${encodeProjectId(projectId)}/labels/${encodedName}`;
 
@@ -57,6 +90,13 @@ export async function updateLabel(
 }
 
 export async function deleteLabel(projectId: string, name: string): Promise<void> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!name?.trim()) {
+    throw new Error("Label name is required");
+  }
+
   const encodedName = encodeURIComponent(name);
   const endpoint = `/projects/${encodeProjectId(projectId)}/labels/${encodedName}`;
 

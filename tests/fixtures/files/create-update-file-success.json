@@ -1,0 +1,16 @@
+{
+  "file_path": "src/new-file.ts",
+  "branch": "main",
+  "commit_id": "abc123def456789",
+  "content": {
+    "file_name": "new-file.ts",
+    "file_path": "src/new-file.ts",
+    "size": 256,
+    "encoding": "base64",
+    "content": "ZXhwb3J0IGNvbnN0IGhlbGxvID0gKCkgPT4gY29uc29sZS5sb2coJ0hlbGxvIFdvcmxkJyk7",
+    "content_sha256": "def456abc123",
+    "ref": "main",
+    "blob_id": "newblob123",
+    "last_commit_id": "abc123def456789"
+  }
+}

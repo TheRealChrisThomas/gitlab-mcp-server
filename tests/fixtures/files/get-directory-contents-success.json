@@ -1,0 +1,26 @@
+[
+  {
+    "name": "src",
+    "path": "src",
+    "type": "tree",
+    "mode": "040000",
+    "id": "tree123",
+    "web_url": "http://example.com/group/project/-/tree/main/src"
+  },
+  {
+    "name": "README.md",
+    "path": "README.md",
+    "type": "blob",
+    "mode": "100644",
+    "id": "blob456",
+    "web_url": "http://example.com/group/project/-/blob/main/README.md"
+  },
+  {
+    "name": "package.json",
+    "path": "package.json",
+    "type": "blob",
+    "mode": "100644",
+    "id": "blob789",
+    "web_url": "http://example.com/group/project/-/blob/main/package.json"
+  }
+]

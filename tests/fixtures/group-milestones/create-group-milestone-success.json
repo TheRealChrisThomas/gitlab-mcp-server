@@ -1,0 +1,14 @@
+{
+  "id": 3004,
+  "iid": 4,
+  "group_id": 12345,
+  "title": "Q2 2024 Planning",
+  "description": "Second quarter planning and resource allocation",
+  "state": "active",
+  "created_at": "2024-03-01T10:00:00.000Z",
+  "updated_at": "2024-03-01T10:00:00.000Z",
+  "due_date": "2024-06-30",
+  "start_date": "2024-04-01",
+  "web_url": "http://example.com/groups/mygroup/-/milestones/4",
+  "expired": false
+}

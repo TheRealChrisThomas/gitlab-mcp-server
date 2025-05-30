@@ -1,0 +1,72 @@
+{
+  "id": 2001,
+  "iid": 1,
+  "project_id": 39430079,
+  "title": "Add new feature",
+  "description": "This merge request adds a new feature to the application",
+  "state": "opened",
+  "created_at": "2023-05-16T10:00:00.000Z",
+  "updated_at": "2023-05-16T10:00:00.000Z",
+  "merged_by": null,
+  "merge_user": null,
+  "merged_at": null,
+  "closed_by": null,
+  "closed_at": null,
+  "target_branch": "main",
+  "source_branch": "feature/new-feature",
+  "user_notes_count": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "author": {
+    "id": 789,
+    "name": "John Doe",
+    "username": "johndoe",
+    "state": "active",
+    "avatar_url": "https://gitlab.example.com/uploads/user/avatar/789/avatar.png",
+    "web_url": "https://gitlab.example.com/johndoe"
+  },
+  "assignees": [],
+  "assignee": null,
+  "reviewers": [],
+  "source_project_id": 39430079,
+  "target_project_id": 39430079,
+  "labels": ["feature"],
+  "draft": false,
+  "work_in_progress": false,
+  "milestone": null,
+  "merge_when_pipeline_succeeds": false,
+  "merge_status": "can_be_merged",
+  "sha": "abc123def456",
+  "merge_commit_sha": null,
+  "squash_commit_sha": null,
+  "discussion_locked": null,
+  "should_remove_source_branch": true,
+  "force_remove_source_branch": false,
+  "allow_collaboration": false,
+  "allow_maintainer_to_push": false,
+  "web_url": "https://gitlab.example.com/group/project/-/merge_requests/1",
+  "references": {
+    "short": "!1",
+    "relative": "!1",
+    "full": "group/project!1"
+  },
+  "time_stats": {
+    "time_estimate": 0,
+    "total_time_spent": 0,
+    "human_time_estimate": null,
+    "human_total_time_spent": null
+  },
+  "squash": false,
+  "task_completion_status": {
+    "count": 0,
+    "completed_count": 0
+  },
+  "has_conflicts": false,
+  "blocking_discussions_resolved": true,
+  "subscribed": true,
+  "diff_refs": {
+    "base_sha": "abc123def456",
+    "head_sha": "def456abc123",
+    "start_sha": "abc123def456"
+  }
+}

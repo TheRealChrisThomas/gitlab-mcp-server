@@ -9,6 +9,16 @@ export async function listMilestones(
   page: number = 1,
   perPage: number = 20
 ): Promise<GitLabMilestoneResponse[]> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (page < 1) {
+    throw new Error("Page number must be 1 or greater");
+  }
+  if (perPage < 1 || perPage > 100) {
+    throw new Error("Per page must be between 1 and 100");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/milestones`;
   const params = buildSearchParams({
     ...(state && { state }),
@@ -27,6 +37,13 @@ export async function createMilestone(
   dueDate?: string,
   startDate?: string
 ): Promise<GitLabMilestoneResponse> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!title?.trim()) {
+    throw new Error("Milestone title is required");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/milestones`;
 
   const milestone = await gitlabPost<GitLabMilestoneResponse>(endpoint, {
@@ -50,6 +67,13 @@ export async function updateMilestone(
     state_event?: "close" | "activate";
   }
 ): Promise<GitLabMilestoneResponse> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!milestoneId || milestoneId < 1) {
+    throw new Error("Valid milestone ID is required");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/milestones/${milestoneId}`;
 
   const milestone = await gitlabPut<GitLabMilestoneResponse>(endpoint, options);
@@ -57,6 +81,13 @@ export async function updateMilestone(
 }
 
 export async function deleteMilestone(projectId: string, milestoneId: number): Promise<void> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!milestoneId || milestoneId < 1) {
+    throw new Error("Valid milestone ID is required");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/milestones/${milestoneId}`;
   await gitlabDelete(endpoint);
 }

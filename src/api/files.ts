@@ -3,6 +3,13 @@ import type { GitLabContent, GitLabCreateUpdateFileResponse, GitLabCommit, FileO
 import { GitLabContentSchema, GitLabCreateUpdateFileResponseSchema, GitLabCommitSchema } from "../types/index.js";
 
 export async function getFileContents(projectId: string, filePath: string, ref?: string): Promise<GitLabContent> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!filePath?.trim()) {
+    throw new Error("File path is required");
+  }
+
   const encodedPath = encodeFilePath(filePath);
   const endpoint = `/projects/${encodeProjectId(projectId)}/repository/files/${encodedPath}`;
   const refParam = ref || "HEAD";
@@ -26,6 +33,22 @@ export async function createOrUpdateFile(
   branch: string,
   previousPath?: string
 ): Promise<GitLabCreateUpdateFileResponse> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!filePath?.trim()) {
+    throw new Error("File path is required");
+  }
+  if (!content) {
+    throw new Error("File content is required");
+  }
+  if (!commitMessage?.trim()) {
+    throw new Error("Commit message is required");
+  }
+  if (!branch?.trim()) {
+    throw new Error("Branch is required");
+  }
+
   const encodedPath = encodeFilePath(filePath);
   const endpoint = `/projects/${encodeProjectId(projectId)}/repository/files/${encodedPath}`;
 
@@ -59,6 +82,19 @@ export async function createCommit(
   branch: string,
   actions: FileOperation[]
 ): Promise<GitLabCommit> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!message?.trim()) {
+    throw new Error("Commit message is required");
+  }
+  if (!branch?.trim()) {
+    throw new Error("Branch is required");
+  }
+  if (!actions || actions.length === 0) {
+    throw new Error("At least one file action is required");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/repository/commits`;
 
   const commit = await gitlabPost<GitLabCommit>(endpoint, {

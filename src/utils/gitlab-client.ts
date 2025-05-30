@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import { GITLAB_API_URL, DEFAULT_HEADERS, AUTH_HEADERS } from "./constants.js";
 
 export class GitLabApiError extends Error {
-  constructor(message: string, public status?: number) {
+  constructor(message: string, public status?: number, public details?: any) {
     super(`GitLab API error: ${message}`);
     this.name = "GitLabApiError";
   }
@@ -19,7 +19,13 @@ export async function gitlabGet<T>(endpoint: string, searchParams?: URLSearchPar
   });
 
   if (!response.ok) {
-    throw new GitLabApiError(response.statusText, response.status);
+    let errorDetails;
+    try {
+      errorDetails = await response.json();
+    } catch {
+      // If response body isn't JSON, ignore
+    }
+    throw new GitLabApiError(response.statusText, response.status, errorDetails);
   }
 
   return (await response.json()) as T;
@@ -33,7 +39,13 @@ export async function gitlabPost<T>(endpoint: string, body?: object): Promise<T>
   });
 
   if (!response.ok) {
-    throw new GitLabApiError(response.statusText, response.status);
+    let errorDetails;
+    try {
+      errorDetails = await response.json();
+    } catch {
+      // If response body isn't JSON, ignore
+    }
+    throw new GitLabApiError(response.statusText, response.status, errorDetails);
   }
 
   return (await response.json()) as T;
@@ -47,7 +59,13 @@ export async function gitlabPut<T>(endpoint: string, body?: object): Promise<T> 
   });
 
   if (!response.ok) {
-    throw new GitLabApiError(response.statusText, response.status);
+    let errorDetails;
+    try {
+      errorDetails = await response.json();
+    } catch {
+      // If response body isn't JSON, ignore
+    }
+    throw new GitLabApiError(response.statusText, response.status, errorDetails);
   }
 
   return (await response.json()) as T;

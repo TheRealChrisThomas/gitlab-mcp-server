@@ -21,6 +21,16 @@ export async function listGroupMilestones(
     per_page?: number;
   } = {}
 ): Promise<GitLabGroupMilestoneResponse[]> {
+  if (!groupId?.trim()) {
+    throw new Error("Group ID is required");
+  }
+  if (options.page !== undefined && options.page < 1) {
+    throw new Error("Page number must be 1 or greater");
+  }
+  if (options.per_page !== undefined && (options.per_page < 1 || options.per_page > 100)) {
+    throw new Error("Per page must be between 1 and 100");
+  }
+
   const endpoint = `/groups/${encodeURIComponent(groupId)}/milestones`;
   const params = buildSearchParams(options);
 
@@ -35,6 +45,13 @@ export async function createGroupMilestone(
   dueDate?: string,
   startDate?: string
 ): Promise<GitLabGroupMilestoneResponse> {
+  if (!groupId?.trim()) {
+    throw new Error("Group ID is required");
+  }
+  if (!title?.trim()) {
+    throw new Error("Milestone title is required");
+  }
+
   const endpoint = `/groups/${encodeURIComponent(groupId)}/milestones`;
 
   const milestone = await gitlabPost<GitLabGroupMilestoneResponse>(endpoint, {
@@ -58,6 +75,13 @@ export async function updateGroupMilestone(
     state_event?: "close" | "activate";
   }
 ): Promise<GitLabGroupMilestoneResponse> {
+  if (!groupId?.trim()) {
+    throw new Error("Group ID is required");
+  }
+  if (!milestoneId || milestoneId < 1) {
+    throw new Error("Valid milestone ID is required");
+  }
+
   const endpoint = `/groups/${encodeURIComponent(groupId)}/milestones/${milestoneId}`;
 
   const milestone = await gitlabPut<GitLabGroupMilestoneResponse>(endpoint, options);
@@ -65,6 +89,13 @@ export async function updateGroupMilestone(
 }
 
 export async function deleteGroupMilestone(groupId: string, milestoneId: number): Promise<void> {
+  if (!groupId?.trim()) {
+    throw new Error("Group ID is required");
+  }
+  if (!milestoneId || milestoneId < 1) {
+    throw new Error("Valid milestone ID is required");
+  }
+
   const endpoint = `/groups/${encodeURIComponent(groupId)}/milestones/${milestoneId}`;
   await gitlabDelete(endpoint);
 }

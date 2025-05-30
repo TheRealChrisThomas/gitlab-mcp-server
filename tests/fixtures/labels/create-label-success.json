@@ -1,0 +1,13 @@
+{
+  "id": 1004,
+  "name": "high-priority",
+  "color": "#ff4444",
+  "description": "High priority issues that need immediate attention",
+  "text_color": "#ffffff",
+  "priority": 1,
+  "is_project_label": true,
+  "open_issues_count": 0,
+  "closed_issues_count": 0,
+  "open_merge_requests_count": 0,
+  "subscribed": false
+}

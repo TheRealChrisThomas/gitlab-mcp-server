@@ -24,6 +24,10 @@ export async function listMergeRequests(
     per_page?: number;
   } = {}
 ): Promise<GitLabMergeRequest[]> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/merge_requests`;
   const params = buildSearchParams(options);
 
@@ -32,6 +36,19 @@ export async function listMergeRequests(
 }
 
 export async function createMergeRequest(projectId: string, options: CreateMergeRequestOptions): Promise<GitLabMergeRequest> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!options?.title?.trim()) {
+    throw new Error("Merge request title is required");
+  }
+  if (!options?.source_branch?.trim()) {
+    throw new Error("Source branch is required");
+  }
+  if (!options?.target_branch?.trim()) {
+    throw new Error("Target branch is required");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/merge_requests`;
 
   const mergeRequest = await gitlabPost<GitLabMergeRequest>(endpoint, {
@@ -60,6 +77,13 @@ export async function updateMergeRequest(
     remove_source_branch?: boolean;
   }
 ): Promise<GitLabMergeRequest> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!mergeRequestIid || mergeRequestIid < 1) {
+    throw new Error("Valid merge request IID is required");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/merge_requests/${mergeRequestIid}`;
 
   const mergeRequest = await gitlabPut<GitLabMergeRequest>(endpoint, {
@@ -80,6 +104,13 @@ export async function mergeMergeRequest(
     sha?: string;
   } = {}
 ): Promise<GitLabMergeRequest> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!mergeRequestIid || mergeRequestIid < 1) {
+    throw new Error("Valid merge request IID is required");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/merge_requests/${mergeRequestIid}/merge`;
 
   const mergeRequest = await gitlabPut<GitLabMergeRequest>(endpoint, options);
@@ -87,6 +118,16 @@ export async function mergeMergeRequest(
 }
 
 export async function addMergeRequestComment(projectId: string, mergeRequestIid: number, body: string): Promise<GitLabComment> {
+  if (!projectId?.trim()) {
+    throw new Error("Project ID is required");
+  }
+  if (!mergeRequestIid || mergeRequestIid < 1) {
+    throw new Error("Valid merge request IID is required");
+  }
+  if (!body?.trim()) {
+    throw new Error("Comment body is required");
+  }
+
   const endpoint = `/projects/${encodeProjectId(projectId)}/merge_requests/${mergeRequestIid}/notes`;
 
   const comment = await gitlabPost<GitLabComment>(endpoint, { body });
