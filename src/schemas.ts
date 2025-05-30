@@ -239,11 +239,14 @@ export const GitLabIssueSchema = z.object({
   iid: z.number(), // Added to match GitLab API
   project_id: z.number(), // Added to match GitLab API
   title: z.string(),
-  description: z.string(), // Changed from body to match GitLab API
+  description: z.string().nullable(), // Changed from z.string() to allow null
   state: z.string(),
   author: GitLabUserSchema,
   assignees: z.array(GitLabUserSchema),
-  labels: z.array(z.string()),
+  labels: z.union([
+    z.array(z.string()), // Simple string format when with_labels_details=false
+    z.array(GitLabLabelSchema) // Object format when with_labels_details=true
+  ]),
   milestone: GitLabMilestoneSchema.nullable(),
   created_at: z.string(),
   updated_at: z.string(),
@@ -490,7 +493,8 @@ export const ListIssuesSchema = z.object({
     .describe("Sort issues"),
   order_by: z.enum(["asc", "desc"]).optional().describe("Sort order"),
   page: z.number().optional().describe("Page number for pagination (default: 1)"),
-  per_page: z.number().optional().describe("Number of results per page (default: 20)")
+  per_page: z.number().optional().describe("Number of results per page (default: 20)"),
+  with_labels_details: z.boolean().optional().describe("If true, returns more details for each label. Default is false.")
 });
 
 export const UpdateIssueSchema = z.object({

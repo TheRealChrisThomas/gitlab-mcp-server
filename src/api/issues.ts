@@ -20,6 +20,7 @@ export async function listIssues(
     order_by?: "asc" | "desc";
     page?: number;
     per_page?: number;
+    with_labels_details?: boolean;
   } = {}
 ): Promise<GitLabIssue[]> {
   if (!projectId?.trim()) {
