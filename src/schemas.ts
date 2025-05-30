@@ -199,6 +199,7 @@ export const GitLabUserSchema = z.object({
   username: z.string(), // Changed from login to match GitLab API
   id: z.number(),
   name: z.string(),
+  state: z.string(), // Added missing state field from GitLab API
   avatar_url: z.string(),
   web_url: z.string() // Changed from html_url to match GitLab API
 });
@@ -206,7 +207,7 @@ export const GitLabUserSchema = z.object({
 export const GitLabMilestoneSchema = z.object({
   id: z.number(),
   iid: z.number(),
-  project_id: z.number(),
+  project_id: z.number().optional(),
   title: z.string(),
   description: z.string().nullable(),
   state: z.string(),
