@@ -390,6 +390,7 @@ This workflow is especially useful for large organizations with multiple related
       - `order_by` (optional string): 'asc' or 'desc'
       - `page` (optional number): Page number for pagination
       - `per_page` (optional number): Results per page (default 20)
+      - `with_labels_details` (optional boolean): If true, returns more details for each label. Default is false.
     - Returns: Array of issue objects
 
 24. `update_issue`
