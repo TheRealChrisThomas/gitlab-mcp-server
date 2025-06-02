@@ -184,7 +184,10 @@ export const GitLabGroupMilestoneSchema = z
 
 export const GitLabIssueSchema = z
   .object({
-    id: z.number()
+    id: z.number(),
+    description: z.string().nullable().optional(), // Can be string, null, or not present
+    labels: z.array(z.union([z.string(), GitLabLabelSchema])).optional(), // Can be array of strings or Label objects, or not present
+    milestone: GitLabMilestoneSchema.nullable().optional() // Can be Milestone object, null, or not present
   })
   .passthrough(); // Allow all other fields to flow through for LLM processing
 
