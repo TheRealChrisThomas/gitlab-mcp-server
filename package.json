@@ -1,6 +1,6 @@
 {
   "name": "@therealchristhomas/gitlab-mcp-server",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "MCP Server for GitLab API operations",
   "type": "module",
   "main": "./dist/index.js",
@@ -20,6 +20,7 @@
     "@modelcontextprotocol/sdk": "^1.0.2",
     "@types/node-fetch": "^2.6.11",
     "node-fetch": "^2.7.0",
+    "remove-markdown": "^0.6.2",
     "zod": "^3.23.8",
     "zod-to-json-schema": "^3.23.5"
   },
