@@ -26,3 +26,6 @@ Thumbs.db
 # Environment files
 .env
 .env.local 
+
+example.json
+test-mcp-client.js

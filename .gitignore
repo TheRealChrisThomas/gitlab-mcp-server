@@ -93,3 +93,6 @@ gitlab-token.txt
 *.zip
 *.tar.gz
 *.rar
+
+example.json
+test-mcp-client.js

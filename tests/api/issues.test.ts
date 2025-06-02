@@ -29,11 +29,24 @@ describe("Issues API", () => {
       const result = await listIssues("39430079");
 
       expect(mockGitlabGet).toHaveBeenCalledWith("/projects/39430079/issues", expect.any(URLSearchParams));
-      expect(result).toHaveLength(2);
+      expect(result).toHaveLength(4);
       expect(result[0]).toHaveProperty("id", 1);
       expect(result[0]).toHaveProperty("title", "Fix login bug");
       expect(result[0]).toHaveProperty("state", "opened");
       expect(result[1]).toHaveProperty("state", "closed");
+
+      // Test project milestone (has project_id)
+      expect(result[0].milestone).toHaveProperty("project_id", 39430079);
+
+      // Test group milestones (no project_id)
+      expect(result[2].milestone).not.toHaveProperty("project_id");
+      expect((result[2].milestone as any)?.web_url).toContain("/groups/");
+      expect(result[3].milestone).not.toHaveProperty("project_id");
+      expect((result[3].milestone as any)?.web_url).toContain("/groups/");
+
+      // Test null descriptions
+      expect(result[1]).toHaveProperty("description", null);
+      expect(result[3]).toHaveProperty("description", null);
     });
 
     it("should handle filtering by state", async () => {
@@ -190,7 +203,7 @@ describe("Issues API", () => {
       const result = await searchIssues("39430079", "bug fix");
 
       expect(mockGitlabGet).toHaveBeenCalledWith("/projects/39430079/issues", expect.any(URLSearchParams));
-      expect(result).toHaveLength(2);
+      expect(result).toHaveLength(4);
     });
 
     it("should search with additional filters", async () => {

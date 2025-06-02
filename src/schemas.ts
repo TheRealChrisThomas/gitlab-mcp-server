@@ -181,79 +181,44 @@ export const GitLabForkSchema = GitLabRepositorySchema.extend({
 });
 
 // Issue related schemas
-export const GitLabLabelSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  color: z.string(),
-  description: z.string().nullable(),
-  text_color: z.string().optional(),
-  priority: z.number().nullable().optional(),
-  is_project_label: z.boolean().optional(),
-  open_issues_count: z.number().optional(),
-  closed_issues_count: z.number().optional(),
-  open_merge_requests_count: z.number().optional(),
-  subscribed: z.boolean().optional()
-});
+export const GitLabLabelSchema = z
+  .object({
+    id: z.number(),
+    name: z.string(),
+    color: z.string()
+  })
+  .passthrough(); // Allow all other fields to flow through
 
-export const GitLabUserSchema = z.object({
-  username: z.string(), // Changed from login to match GitLab API
-  id: z.number(),
-  name: z.string(),
-  state: z.string(), // Added missing state field from GitLab API
-  avatar_url: z.string(),
-  web_url: z.string() // Changed from html_url to match GitLab API
-});
+export const GitLabUserSchema = z
+  .object({
+    id: z.number(),
+    username: z.string(), // Changed from login to match GitLab API
+    name: z.string()
+  })
+  .passthrough(); // Allow additional fields not in schema
 
-export const GitLabMilestoneSchema = z.object({
-  id: z.number(),
-  iid: z.number(),
-  project_id: z.number().optional(),
-  title: z.string(),
-  description: z.string().nullable(),
-  state: z.string(),
-  created_at: z.string(),
-  updated_at: z.string(),
-  due_date: z.string().nullable(),
-  start_date: z.string().nullable(),
-  web_url: z.string(),
-  expired: z.boolean().optional()
-});
+export const GitLabMilestoneSchema = z
+  .object({
+    id: z.number(),
+    title: z.string()
+  })
+  .passthrough(); // Allow all other fields to flow through
 
 // Group milestone schema (similar to project milestone but with group_id)
-export const GitLabGroupMilestoneSchema = z.object({
-  id: z.number(),
-  iid: z.number(),
-  group_id: z.number(), // Changed from project_id to group_id
-  title: z.string(),
-  description: z.string().nullable(),
-  state: z.string(),
-  created_at: z.string(),
-  updated_at: z.string(),
-  due_date: z.string().nullable(),
-  start_date: z.string().nullable(),
-  web_url: z.string(),
-  expired: z.boolean().optional()
-});
+export const GitLabGroupMilestoneSchema = z
+  .object({
+    id: z.number(),
+    title: z.string()
+  })
+  .passthrough(); // Allow all other fields to flow through
 
-export const GitLabIssueSchema = z.object({
-  id: z.number(),
-  iid: z.number(), // Added to match GitLab API
-  project_id: z.number(), // Added to match GitLab API
-  title: z.string(),
-  description: z.string().nullable(), // Changed from z.string() to allow null
-  state: z.string(),
-  author: GitLabUserSchema,
-  assignees: z.array(GitLabUserSchema),
-  labels: z.union([
-    z.array(z.string()), // Simple string format when with_labels_details=false
-    z.array(GitLabLabelSchema) // Object format when with_labels_details=true
-  ]),
-  milestone: GitLabMilestoneSchema.nullable(),
-  created_at: z.string(),
-  updated_at: z.string(),
-  closed_at: z.string().nullable(),
-  web_url: z.string() // Changed from html_url to match GitLab API
-});
+export const GitLabIssueSchema = z
+  .object({
+    id: z.number(),
+    iid: z.number(),
+    title: z.string()
+  })
+  .passthrough(); // Allow all other fields to flow through for LLM processing
 
 // Merge Request related schemas (equivalent to Pull Request)
 export const GitLabMergeRequestDiffRefSchema = z.object({
@@ -262,26 +227,13 @@ export const GitLabMergeRequestDiffRefSchema = z.object({
   start_sha: z.string()
 });
 
-export const GitLabMergeRequestSchema = z.object({
-  id: z.number(),
-  iid: z.number(), // Added to match GitLab API
-  project_id: z.number(), // Added to match GitLab API
-  title: z.string(),
-  description: z.string(), // Changed from body to match GitLab API
-  state: z.string(),
-  merged: z.boolean().optional(),
-  author: GitLabUserSchema,
-  assignees: z.array(GitLabUserSchema),
-  source_branch: z.string(), // Changed from head to match GitLab API
-  target_branch: z.string(), // Changed from base to match GitLab API
-  diff_refs: GitLabMergeRequestDiffRefSchema.nullable(),
-  web_url: z.string(), // Changed from html_url to match GitLab API
-  created_at: z.string(),
-  updated_at: z.string(),
-  merged_at: z.string().nullable(),
-  closed_at: z.string().nullable(),
-  merge_commit_sha: z.string().nullable()
-});
+export const GitLabMergeRequestSchema = z
+  .object({
+    id: z.number(),
+    iid: z.number(),
+    title: z.string()
+  })
+  .passthrough(); // Allow all other fields to flow through for LLM processing
 
 // API Operation Parameter Schemas
 const ProjectParamsSchema = z.object({
@@ -574,17 +526,13 @@ export const AddMergeRequestCommentSchema = z.object({
 });
 
 // Comment response schema
-export const GitLabCommentSchema = z.object({
-  id: z.number(),
-  body: z.string(),
-  author: GitLabUserSchema,
-  created_at: z.string(),
-  updated_at: z.string(),
-  system: z.boolean(),
-  noteable_id: z.number(),
-  noteable_type: z.string(),
-  web_url: z.string()
-});
+export const GitLabCommentSchema = z
+  .object({
+    id: z.number(),
+    body: z.string(),
+    author: GitLabUserSchema
+  })
+  .passthrough(); // Allow all other fields to flow through for LLM processing
 
 // Export types
 export type GitLabAuthor = z.infer<typeof GitLabAuthorSchema>;
