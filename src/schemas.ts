@@ -17,43 +17,27 @@ export const GitLabOwnerSchema = z.object({
   state: z.string() // Added as GitLab includes user state
 });
 
-export const GitLabRepositorySchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  path_with_namespace: z.string(), // Changed from full_name to match GitLab API
-  visibility: z.string(), // Changed from private to match GitLab API
-  owner: GitLabOwnerSchema.optional(),
-  web_url: z.string(), // Changed from html_url to match GitLab API
-  description: z.string().nullable(),
-  fork: z.boolean().optional(),
-  ssh_url_to_repo: z.string(), // Changed from ssh_url to match GitLab API
-  http_url_to_repo: z.string(), // Changed from clone_url to match GitLab API
-  created_at: z.string(),
-  last_activity_at: z.string(), // Changed from updated_at to match GitLab API
-  default_branch: z.string()
-});
+export const GitLabRepositorySchema = z
+  .object({
+    id: z.number()
+  })
+  .passthrough(); // Allow all other fields to flow through
 
 // File content schemas
-export const GitLabFileContentSchema = z.object({
-  file_name: z.string(), // Changed from name to match GitLab API
-  file_path: z.string(), // Changed from path to match GitLab API
-  size: z.number(),
-  encoding: z.string(),
-  content: z.string(),
-  content_sha256: z.string(), // Changed from sha to match GitLab API
-  ref: z.string(), // Added as GitLab requires branch reference
-  blob_id: z.string(), // Added to match GitLab API
-  last_commit_id: z.string() // Added to match GitLab API
-});
+export const GitLabFileContentSchema = z
+  .object({
+    file_name: z.string(),
+    file_path: z.string(),
+    content: z.string()
+  })
+  .passthrough(); // Allow all other fields to flow through
 
-export const GitLabDirectoryContentSchema = z.object({
-  name: z.string(),
-  path: z.string(),
-  type: z.string(),
-  mode: z.string(),
-  id: z.string(), // Changed from sha to match GitLab API
-  web_url: z.string() // Changed from html_url to match GitLab API
-});
+export const GitLabDirectoryContentSchema = z
+  .object({
+    name: z.string(),
+    path: z.string()
+  })
+  .passthrough(); // Allow all other fields to flow through
 
 export const GitLabContentSchema = z.union([GitLabFileContentSchema, z.array(GitLabDirectoryContentSchema)]);
 
@@ -145,19 +129,11 @@ export const GitLabSearchResponseSchema = z.object({
 });
 
 // Group related schemas
-export const GitLabGroupSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  path: z.string(),
-  description: z.string().nullable(),
-  visibility: z.string(),
-  full_name: z.string(),
-  full_path: z.string(),
-  web_url: z.string(),
-  avatar_url: z.string().nullable(),
-  created_at: z.string(),
-  parent_id: z.number().nullable()
-});
+export const GitLabGroupSchema = z
+  .object({
+    id: z.number()
+  })
+  .passthrough(); // Allow all other fields to flow through
 
 export const GitLabGroupSearchResponseSchema = z.object({
   count: z.number(),
@@ -183,40 +159,32 @@ export const GitLabForkSchema = GitLabRepositorySchema.extend({
 // Issue related schemas
 export const GitLabLabelSchema = z
   .object({
-    id: z.number(),
-    name: z.string(),
-    color: z.string()
+    id: z.number()
   })
   .passthrough(); // Allow all other fields to flow through
 
 export const GitLabUserSchema = z
   .object({
-    id: z.number(),
-    username: z.string(), // Changed from login to match GitLab API
-    name: z.string()
+    id: z.number()
   })
-  .passthrough(); // Allow additional fields not in schema
+  .passthrough(); // Allow all other fields to flow through
 
 export const GitLabMilestoneSchema = z
   .object({
-    id: z.number(),
-    title: z.string()
+    id: z.number()
   })
   .passthrough(); // Allow all other fields to flow through
 
 // Group milestone schema (similar to project milestone but with group_id)
 export const GitLabGroupMilestoneSchema = z
   .object({
-    id: z.number(),
-    title: z.string()
+    id: z.number()
   })
   .passthrough(); // Allow all other fields to flow through
 
 export const GitLabIssueSchema = z
   .object({
-    id: z.number(),
-    iid: z.number(),
-    title: z.string()
+    id: z.number()
   })
   .passthrough(); // Allow all other fields to flow through for LLM processing
 
@@ -229,9 +197,7 @@ export const GitLabMergeRequestDiffRefSchema = z.object({
 
 export const GitLabMergeRequestSchema = z
   .object({
-    id: z.number(),
-    iid: z.number(),
-    title: z.string()
+    id: z.number()
   })
   .passthrough(); // Allow all other fields to flow through for LLM processing
 
@@ -528,9 +494,7 @@ export const AddMergeRequestCommentSchema = z.object({
 // Comment response schema
 export const GitLabCommentSchema = z
   .object({
-    id: z.number(),
-    body: z.string(),
-    author: GitLabUserSchema
+    id: z.number()
   })
   .passthrough(); // Allow all other fields to flow through for LLM processing
 
