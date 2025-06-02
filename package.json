@@ -1,14 +1,14 @@
 {
   "name": "@therealchristhomas/gitlab-mcp-server",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "description": "MCP Server for GitLab API operations",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/src/index.js",
   "bin": {
-    "gitlab-mcp": "./dist/index.js"
+    "gitlab-mcp": "./dist/src/index.js"
   },
   "scripts": {
-    "build": "tsc && shx chmod +x dist/*.js",
+    "build": "shx rm -rf dist && tsc && shx chmod +x dist/src/*.js",
     "prepare": "npm run build",
     "dev": "node --loader ts-node/esm src/index.ts",
     "watch": "tsc --watch",
@@ -20,7 +20,6 @@
     "@modelcontextprotocol/sdk": "^1.0.2",
     "@types/node-fetch": "^2.6.11",
     "node-fetch": "^2.7.0",
-    "remove-markdown": "^0.6.2",
     "zod": "^3.23.8",
     "zod-to-json-schema": "^3.23.5"
   },
@@ -35,7 +34,7 @@
     "typescript": "^5.6.3"
   },
   "files": [
-    "dist/**/*",
+    "dist/src/**/*",
     "README.md",
     "package.json"
   ],

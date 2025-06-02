@@ -1,5 +1,4 @@
 import { z } from "zod";
-import removeMd from "remove-markdown";
 import { gitlabGet, gitlabPost, gitlabPut, encodeProjectId, buildSearchParams } from "../utils/gitlab-client.js";
 import type { GitLabIssue, GitLabComment, CreateIssueOptions } from "../types/index.js";
 import { GitLabIssueSchema, GitLabCommentSchema } from "../types/index.js";
@@ -32,23 +31,7 @@ export async function listIssues(
   const params = buildSearchParams(options);
 
   const rawIssues = await gitlabGet<any[]>(endpoint, params);
-
-  const processedIssues = rawIssues.map((issue) => {
-    let plainTextDescription = issue.description;
-    if (issue.description && typeof issue.description === "string") {
-      try {
-        plainTextDescription = removeMd(issue.description);
-      } catch (e) {
-        console.error("Failed to remove markdown from description:", e);
-      }
-    }
-    return {
-      ...issue,
-      description: plainTextDescription
-    };
-  });
-
-  return z.array(GitLabIssueSchema).parse(processedIssues);
+  return z.array(GitLabIssueSchema).parse(rawIssues);
 }
 
 export async function createIssue(projectId: string, options: CreateIssueOptions): Promise<GitLabIssue> {
@@ -69,15 +52,7 @@ export async function createIssue(projectId: string, options: CreateIssueOptions
     labels: options.labels?.join(",")
   });
 
-  let returnedIssue = GitLabIssueSchema.parse(issue);
-  if (returnedIssue.description && typeof returnedIssue.description === "string") {
-    try {
-      returnedIssue.description = removeMd(returnedIssue.description);
-    } catch (e) {
-      console.error("Failed to remove markdown from description (createIssue):", e);
-    }
-  }
-  return returnedIssue;
+  return GitLabIssueSchema.parse(issue);
 }
 
 export async function updateIssue(
@@ -106,15 +81,7 @@ export async function updateIssue(
     labels: options.labels?.join(",")
   });
 
-  let returnedIssue = GitLabIssueSchema.parse(issue);
-  if (returnedIssue.description && typeof returnedIssue.description === "string") {
-    try {
-      returnedIssue.description = removeMd(returnedIssue.description);
-    } catch (e) {
-      console.error("Failed to remove markdown from description (updateIssue):", e);
-    }
-  }
-  return returnedIssue;
+  return GitLabIssueSchema.parse(issue);
 }
 
 export async function searchIssues(

@@ -171,7 +171,8 @@ export const GitLabUserSchema = z
 
 export const GitLabMilestoneSchema = z
   .object({
-    id: z.number()
+    id: z.number(),
+    project_id: z.number().optional() // Make project_id optional since it might not always be present
   })
   .passthrough(); // Allow all other fields to flow through
 
@@ -185,9 +186,9 @@ export const GitLabGroupMilestoneSchema = z
 export const GitLabIssueSchema = z
   .object({
     id: z.number(),
-    description: z.string().nullable().optional(), // Can be string, null, or not present
-    labels: z.array(z.union([z.string(), GitLabLabelSchema])).optional(), // Can be array of strings or Label objects, or not present
-    milestone: GitLabMilestoneSchema.nullable().optional() // Can be Milestone object, null, or not present
+    description: z.string().nullable(), // Allow null description
+    labels: z.array(z.string()).optional().default([]), // GitLab returns array of strings for labels, not objects
+    milestone: z.any().nullable().optional() // Make milestone completely flexible since project_id is sometimes missing
   })
   .passthrough(); // Allow all other fields to flow through for LLM processing
 
