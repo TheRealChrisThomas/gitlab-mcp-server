@@ -1,5 +1,12 @@
 import { z } from "zod";
-import { gitlabGet, gitlabPost, gitlabPut, encodeProjectId, buildSearchParams } from "../utils/gitlab-client.js";
+import {
+  gitlabGet,
+  gitlabGetWithHeaders,
+  gitlabPost,
+  gitlabPut,
+  encodeProjectId,
+  buildSearchParams
+} from "../utils/gitlab-client.js";
 import type { GitLabIssue, GitLabComment, CreateIssueOptions } from "../types/index.js";
 import { GitLabIssueSchema, GitLabCommentSchema } from "../types/index.js";
 
@@ -28,10 +35,45 @@ export async function listIssues(
   }
 
   const endpoint = `/projects/${encodeProjectId(projectId)}/issues`;
-  const params = buildSearchParams(options);
 
-  const rawIssues = await gitlabGet<any[]>(endpoint, params);
-  return z.array(GitLabIssueSchema).parse(rawIssues);
+  // If user explicitly provides page parameter, use single page request
+  if (options.page !== undefined) {
+    const params = buildSearchParams(options);
+    const rawIssues = await gitlabGet<any[]>(endpoint, params);
+    return z.array(GitLabIssueSchema).parse(rawIssues);
+  }
+
+  // Otherwise, fetch all pages automatically
+  const allIssues: any[] = [];
+  let currentPage = 1;
+  const perPage = options.per_page || 100; // Use max page size for efficiency
+
+  while (true) {
+    const params = buildSearchParams({
+      ...options,
+      page: currentPage,
+      per_page: perPage
+    });
+
+    const response = await gitlabGetWithHeaders<any[]>(endpoint, params);
+    const pageIssues = response.data;
+
+    if (pageIssues.length === 0) {
+      break; // No more issues
+    }
+
+    allIssues.push(...pageIssues);
+
+    // Check if there's a next page
+    const nextPage = response.headers["x-next-page"];
+    if (!nextPage) {
+      break; // No more pages
+    }
+
+    currentPage = parseInt(nextPage, 10);
+  }
+
+  return z.array(GitLabIssueSchema).parse(allIssues);
 }
 
 export async function createIssue(projectId: string, options: CreateIssueOptions): Promise<GitLabIssue> {

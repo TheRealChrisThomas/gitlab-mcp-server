@@ -8,7 +8,20 @@ export class GitLabApiError extends Error {
   }
 }
 
-export async function gitlabGet<T>(endpoint: string, searchParams?: URLSearchParams): Promise<T> {
+interface GitLabResponse<T> {
+  data: T;
+  headers: {
+    "x-next-page"?: string;
+    "x-prev-page"?: string;
+    "x-total"?: string;
+    "x-total-pages"?: string;
+    "x-per-page"?: string;
+    "x-page"?: string;
+    link?: string;
+  };
+}
+
+export async function gitlabGetWithHeaders<T>(endpoint: string, searchParams?: URLSearchParams): Promise<GitLabResponse<T>> {
   const url = new URL(`${GITLAB_API_URL}${endpoint}`);
   if (searchParams) {
     url.search = searchParams.toString();
@@ -28,7 +41,23 @@ export async function gitlabGet<T>(endpoint: string, searchParams?: URLSearchPar
     throw new GitLabApiError(response.statusText, response.status, errorDetails);
   }
 
-  return (await response.json()) as T;
+  const data = (await response.json()) as T;
+  const headers = {
+    "x-next-page": response.headers.get("x-next-page") || undefined,
+    "x-prev-page": response.headers.get("x-prev-page") || undefined,
+    "x-total": response.headers.get("x-total") || undefined,
+    "x-total-pages": response.headers.get("x-total-pages") || undefined,
+    "x-per-page": response.headers.get("x-per-page") || undefined,
+    "x-page": response.headers.get("x-page") || undefined,
+    link: response.headers.get("link") || undefined
+  };
+
+  return { data, headers };
+}
+
+export async function gitlabGet<T>(endpoint: string, searchParams?: URLSearchParams): Promise<T> {
+  const response = await gitlabGetWithHeaders<T>(endpoint, searchParams);
+  return response.data;
 }
 
 export async function gitlabPost<T>(endpoint: string, body?: object): Promise<T> {

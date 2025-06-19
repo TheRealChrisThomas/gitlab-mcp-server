@@ -1,6 +1,6 @@
 {
   "name": "@therealchristhomas/gitlab-mcp-server",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "MCP Server for GitLab API operations",
   "type": "module",
   "main": "./dist/src/index.js",
