@@ -168,7 +168,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "list_issues",
-        description: "List all issues in a GitLab project",
+        description:
+          "List issues in a GitLab project. By default fetches ALL issues automatically across all pages. Only specify 'page' parameter if you need a specific page for manual pagination.",
         inputSchema: zodToJsonSchema(ListIssuesSchema)
       },
       {

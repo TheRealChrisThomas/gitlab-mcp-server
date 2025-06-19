@@ -415,7 +415,12 @@ export const ListIssuesSchema = z.object({
     .optional()
     .describe("Sort issues"),
   order_by: z.enum(["asc", "desc"]).optional().describe("Sort order"),
-  page: z.number().optional().describe("Page number for pagination (default: 1)"),
+  page: z
+    .number()
+    .optional()
+    .describe(
+      "Page number for pagination. ONLY specify this if you need a specific page - by default ALL issues are fetched automatically"
+    ),
   per_page: z.number().optional().describe("Number of results per page (default: 20)"),
   with_labels_details: z.boolean().optional().describe("If true, returns more details for each label. Default is false.")
 });
